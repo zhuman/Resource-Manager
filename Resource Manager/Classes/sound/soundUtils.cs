@@ -1,20 +1,12 @@
 ﻿using System;
-<<<<<<< HEAD
 using System.IO;
 using System.Numerics;
-=======
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Text;
->>>>>>> 3f92ca114e5b86ed99edfd63366968ccb5d4834f
 using System.Threading.Tasks;
 
 namespace Resource_Manager.Classes.sound
 {
     public static class soundUtils
     {
-<<<<<<< HEAD
 
         public async static Task<byte[]> DecryptSound(byte[] source)
         {
@@ -35,20 +27,6 @@ namespace Resource_Manager.Classes.sound
             Array.Copy(source, data, source.Length);
 
 
-=======
-        public static ulong RotateLeft(this ulong value, int count)
-        {
-            return (value << count) | (value >> (64 - count));
-        }
-
-        public async static Task<byte[]> DecryptSound(byte[] data)
-        {
-
-            ulong qword8 = 2564355413007450943;
-            ulong qword10 = 4159887087525648499;
-            ulong qword18 = 3096547199993908069;
-            long currentBlock = data.Length / 8;
->>>>>>> 3f92ca114e5b86ed99edfd63366968ccb5d4834f
             using (var streamReader = new MemoryStream(data, false))
             using (var reader = new BinaryReader(streamReader))
             using (var streamWriter = new MemoryStream())
@@ -60,19 +38,12 @@ namespace Resource_Manager.Classes.sound
                     {
                         var block = reader.ReadUInt64();
 
-<<<<<<< HEAD
                         qword18 = BitOperations.RotateLeft(qword10 * (qword18 + qword8), 32);
                         writer.Write(block ^ qword18);
                         currentBlock--;
                     }
 
 
-=======
-                        qword18 = RotateLeft(qword10 * (qword18 + qword8), 32);
-                        writer.Write(block ^ qword18);
-                        currentBlock--;
-                    }
->>>>>>> 3f92ca114e5b86ed99edfd63366968ccb5d4834f
                 });
                 return streamWriter.ToArray();
             }

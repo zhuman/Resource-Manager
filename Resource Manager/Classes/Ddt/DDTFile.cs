@@ -47,13 +47,8 @@ namespace Resource_Manager.Classes.Ddt
                     Alpha = (DdtFileTypeAlpha)binaryReader.ReadByte();
                     Format = (DdtFileTypeFormat)binaryReader.ReadByte();
                     MipmapLevels = binaryReader.ReadByte();
-<<<<<<< HEAD
                     BaseWidth = (ushort)binaryReader.ReadInt32();
                     BaseHeight = (ushort)binaryReader.ReadInt32();
-=======
-                    BaseWidth = binaryReader.ReadInt32();
-                    BaseHeight = binaryReader.ReadInt32();
->>>>>>> 3f92ca114e5b86ed99edfd63366968ccb5d4834f
                     var images = new List<DdtImage>();
                     var numImagesPerLevel = Usage.HasFlag(DdtFileTypeUsage.Cube) ? 6 : 1;
                     for (var index = 0; index < MipmapLevels * numImagesPerLevel; ++index)
@@ -81,13 +76,8 @@ namespace Resource_Manager.Classes.Ddt
         public DdtFileTypeAlpha Alpha { get; }
         public DdtFileTypeFormat Format { get; }
         public byte MipmapLevels { get; }
-<<<<<<< HEAD
         public ushort BaseWidth { get; }
         public ushort BaseHeight { get; }
-=======
-        public int BaseWidth { get; }
-        public int BaseHeight { get; }
->>>>>>> 3f92ca114e5b86ed99edfd63366968ccb5d4834f
         public IReadOnlyCollection<DdtImage> Images { get; }
 
         public string DdtInfo

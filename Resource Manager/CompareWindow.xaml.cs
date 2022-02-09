@@ -365,20 +365,14 @@ namespace Resource_Manager
             SpinnerFile1.Visibility = Visibility.Visible;
             tbFile.Text = "Opening";
             OpenFileDialog openFileDialog = new OpenFileDialog();
-<<<<<<< HEAD
             openFileDialog.InitialDirectory = Settings.Default.lastOpenedPath;
-=======
->>>>>>> 3f92ca114e5b86ed99edfd63366968ccb5d4834f
             openFileDialog.Filter = "Age of Empires 3 .BAR files (*.bar)|*.bar";
             string filePath;
             if (openFileDialog.ShowDialog() == true)
             {
                 filePath = openFileDialog.FileName;
-<<<<<<< HEAD
                 Settings.Default.lastOpenedPath = Path.GetDirectoryName(filePath);
                 Settings.Default.Save();
-=======
->>>>>>> 3f92ca114e5b86ed99edfd63366968ccb5d4834f
                 tbBar1Name.ToolTip = filePath;
             }
             else
@@ -415,20 +409,14 @@ namespace Resource_Manager
             SpinnerFile1.Visibility = Visibility.Visible;
             tbFile.Text = "Opening";
             OpenFileDialog openFileDialog = new OpenFileDialog();
-<<<<<<< HEAD
             openFileDialog.InitialDirectory = Settings.Default.lastOpenedPath;
-=======
->>>>>>> 3f92ca114e5b86ed99edfd63366968ccb5d4834f
             openFileDialog.Filter = "Age of Empires 3 .BAR files (*.bar)|*.bar";
             string filePath;
             if (openFileDialog.ShowDialog() == true)
             {
                 filePath = openFileDialog.FileName;
-<<<<<<< HEAD
                 Settings.Default.lastOpenedPath = Path.GetDirectoryName(filePath);
                 Settings.Default.Save();
-=======
->>>>>>> 3f92ca114e5b86ed99edfd63366968ccb5d4834f
                 tbBar2Name.ToolTip = filePath;
             }
             else

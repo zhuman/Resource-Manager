@@ -137,11 +137,7 @@ namespace Archive_Unpacker.Classes.BarViewModel
             get
             {
                 if (barFile.barFileHeader.Version == 2)
-<<<<<<< HEAD
                     return Path.GetFileName(barFilePath) + " - AoE3: Legacy";
-=======
-                    return Path.GetFileName(barFilePath) + " - AoE3 (2007)";
->>>>>>> 3f92ca114e5b86ed99edfd63366968ccb5d4834f
                 else
                 if (barFile.barFileHeader.Version == 4)
                     return Path.GetFileName(barFilePath) + " - AoE3: Definitive Edition - 1st wave of beta testing";
@@ -165,11 +161,7 @@ namespace Archive_Unpacker.Classes.BarViewModel
 
 
 
-<<<<<<< HEAD
         public async Task saveFiles(List<BarEntry> files, string savePath, bool Decompress, CancellationToken token, bool convertDDTToPNG, bool convertDDTToTGA, bool convertXMB)
-=======
-        public async Task saveFiles(List<BarEntry> files, string savePath, bool Decompress, CancellationToken token, bool convertDDT, bool convertXMB)
->>>>>>> 3f92ca114e5b86ed99edfd63366968ccb5d4834f
         {
             ResetProgress();
             if (files.Count == 0) return;
@@ -246,23 +238,16 @@ namespace Archive_Unpacker.Classes.BarViewModel
                     xmb.file.Save(newName);
                 }
 
-<<<<<<< HEAD
                 if (file.Extension == ".DDT" && convertDDTToPNG)
-=======
-                if (file.Extension == ".DDT" && convertDDT)
->>>>>>> 3f92ca114e5b86ed99edfd63366968ccb5d4834f
                 {
                     await DdtFileUtils.DdtBytes2PngAsync(data, Path.Combine(savePath, file.FileNameWithRoot));
                 }
 
-<<<<<<< HEAD
                 if (file.Extension == ".DDT" && convertDDTToTGA)
                 {
                     await DdtFileUtils.DdtBytes2TgaAsync(data, Path.Combine(savePath, file.FileNameWithRoot));
                 }
 
-=======
->>>>>>> 3f92ca114e5b86ed99edfd63366968ccb5d4834f
 
                 CurrentProgress += (double)file.FileSize2 / filesSize;
             }
@@ -407,11 +392,7 @@ namespace Archive_Unpacker.Classes.BarViewModel
                 NotifyPropertyChanged("Preview");
                 return;
             }
-<<<<<<< HEAD
             if (file.Extension == ".XAML" || file.Extension == ".XML" || file.Extension == ".SHP" || file.Extension == ".LGT" || file.Extension == ".XS" || file.Extension == ".TXT" || file.Extension == ".CFG" || file.Extension == ".PY" || file.Extension == ".TACTICS")
-=======
-            if (file.Extension == ".XAML" || file.Extension == ".XML" || file.Extension == ".SHP" || file.Extension == ".LGT" || file.Extension == ".XS" || file.Extension == ".TXT" || file.Extension == ".CFG" || file.Extension == ".PY")
->>>>>>> 3f92ca114e5b86ed99edfd63366968ccb5d4834f
             {
                 using FileStream input = File.OpenRead(barFilePath);
                 // Locate the file within the BAR file.

@@ -4,11 +4,7 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Forms;
-<<<<<<< HEAD
 using System.IO;
-=======
-
->>>>>>> 3f92ca114e5b86ed99edfd63366968ccb5d4834f
 
 namespace Resource_Manager
 {
@@ -26,13 +22,8 @@ namespace Resource_Manager
 
         private bool autoDecompress = true;
         private bool autoXMBConversion = false;
-<<<<<<< HEAD
         private bool autoDDTToPNGConversion = false;
         private bool autoDDTToTGAConversion = true;
-=======
-        private bool autoDDTConversion = false;
-
->>>>>>> 3f92ca114e5b86ed99edfd63366968ccb5d4834f
         public bool AutoXMBConversion
         {
             get
@@ -46,7 +37,6 @@ namespace Resource_Manager
             }
         }
 
-<<<<<<< HEAD
         public bool AutoDDTToPNGConversion
         {
             get
@@ -69,17 +59,6 @@ namespace Resource_Manager
             set
             {
                 autoDDTToTGAConversion = value;
-=======
-        public bool AutoDDTConversion
-        {
-            get
-            {
-                return autoDDTConversion;
-            }
-            set
-            {
-                autoDDTConversion = value;
->>>>>>> 3f92ca114e5b86ed99edfd63366968ccb5d4834f
                 NotifyPropertyChanged();
             }
         }
@@ -100,11 +79,7 @@ namespace Resource_Manager
         public ExtractDialog(string DefaultRootPath)
         {         
             InitializeComponent();
-<<<<<<< HEAD
             ExportPath.Text = Directory.Exists(Settings.Default.lastExportedPath) ? Settings.Default.lastExportedPath : DefaultRootPath;
-=======
-            ExportPath.Text = System.IO.Path.GetDirectoryName(DefaultRootPath);
->>>>>>> 3f92ca114e5b86ed99edfd63366968ccb5d4834f
             DataContext = this;
         }
 
@@ -117,11 +92,8 @@ namespace Resource_Manager
                 if (result == System.Windows.Forms.DialogResult.OK)
                 {
                     ExportPath.Text = dialog.SelectedPath;
-<<<<<<< HEAD
                     Settings.Default.lastExportedPath = dialog.SelectedPath;
                     Settings.Default.Save();
-=======
->>>>>>> 3f92ca114e5b86ed99edfd63366968ccb5d4834f
                 }
             }
         }

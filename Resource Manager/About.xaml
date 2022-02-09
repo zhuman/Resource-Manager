@@ -32,17 +32,10 @@
                 <Run Text="Resource Manager" FontSize="22"/>
                 
                 <LineBreak/>
-<<<<<<< HEAD
                 <Run Text="Copyright (c) 2020-2022 VladTheJunior"  FontSize="14"/>
 
                 <LineBreak/>
                 <Run Text="version: 0.4.2"  FontSize="14"/>
-=======
-                <Run Text="Copyright (c) 2020 VladTheJunior"  FontSize="14"/>
-
-                <LineBreak/>
-                <Run Text="version: 0.4.0"  FontSize="14"/>
->>>>>>> 3f92ca114e5b86ed99edfd63366968ccb5d4834f
             </TextBlock>
             <TextBlock  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" >
             <LineBreak/>

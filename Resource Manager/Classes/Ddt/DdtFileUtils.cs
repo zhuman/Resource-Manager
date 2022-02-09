@@ -1,13 +1,9 @@
 ﻿using Resource_Manager.Classes.Alz4;
 using Resource_Manager.Classes.L33TZip;
-<<<<<<< HEAD
 using Resource_Manager.Classes.TGA;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
-=======
-using System.IO;
->>>>>>> 3f92ca114e5b86ed99edfd63366968ccb5d4834f
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 
@@ -15,7 +11,6 @@ namespace Resource_Manager.Classes.Ddt
 {
     public static class DdtFileUtils
     {
-<<<<<<< HEAD
 
         public static async Task Ddt2TgaAsync(string ddtFile)
         {
@@ -71,19 +66,13 @@ namespace Resource_Manager.Classes.Ddt
 
 
 
-=======
->>>>>>> 3f92ca114e5b86ed99edfd63366968ccb5d4834f
         public static async Task Ddt2PngAsync(string ddtFile)
         {
             var outname = ddtFile.ToLower().Replace(".ddt", ".png");
 
             using (var fileStream = new FileStream(outname, FileMode.Create))
             {
-<<<<<<< HEAD
                 // DdtFile ddt = new DdtFile(File.ReadAllBytes(ddtFile));
-=======
-               // DdtFile ddt = new DdtFile(File.ReadAllBytes(ddtFile));
->>>>>>> 3f92ca114e5b86ed99edfd63366968ccb5d4834f
                 BitmapEncoder encoder = new PngBitmapEncoder();
                 var data = await File.ReadAllBytesAsync(ddtFile);
 

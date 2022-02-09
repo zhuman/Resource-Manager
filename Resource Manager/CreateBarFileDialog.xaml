@@ -24,11 +24,7 @@
         </Grid.RowDefinitions>
         <TextBlock Grid.Row="0" Grid.Column="0" Text="Game Version: " HorizontalAlignment="Left" VerticalAlignment="Center"/>
         <ComboBox Margin="5,0,0,0" HorizontalContentAlignment="Center" x:Name="tbGameVersion" Grid.ColumnSpan="2"  Grid.Row="0" Grid.Column="1" SelectedIndex="0" HorizontalAlignment="Stretch">
-<<<<<<< HEAD
             <ComboBoxItem Content="Age of Empires 3: Legacy"/>
-=======
-            <ComboBoxItem Content="Age of Empires 3 (2007)"/>
->>>>>>> 3f92ca114e5b86ed99edfd63366968ccb5d4834f
             <ComboBoxItem Content="Age of Empires 3: DE"/>
         </ComboBox>
         <TextBlock Grid.Row="1" Grid.Column="0" Text="Bar Root Folder: " HorizontalAlignment="Left" VerticalAlignment="Center"/>
