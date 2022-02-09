@@ -15,12 +15,9 @@
 
 *Utility for viewing, comparing, creating and extracting files from Age of Empires III .BAR archive*
 
-**Note by Kevsoft:** VladTheJunior will be inactive for a longer period of time and thus decided to transfer ownership to me, Kevsoft/KevinW1998. I will keep an eye out for issues and pull requests. 
-
 **Developer:** VladTheJunior and Kevsoft<br />
-**Current version:** 0.4.1<br />
+**Current version:** 0.4.2<br />
 [Download Portable (.zip archive)](https://github.com/KevinW1998/Resource-Manager/releases/latest/download/Resource-Manager.zip)<br />
-[Download Standalone (.exe) (Outdated)](https://drive.google.com/file/d/19y7AeWME68FFv5sJeCsORIF5-mLHqCNX/view?usp=sharing)<br />
 
 ## Table of Contents
 
@@ -63,6 +60,7 @@ The updated version includes all **(x)** functions that were in AoE3Ed Viewer, a
 **Conversion:**
 * Converting XML <-> XMB (both 2007 and DE).
 * Converting DDT -> PNG.
+* Converting DDT -> TGA.
 
 **Extract:**
 * Extract all files.
@@ -74,15 +72,15 @@ The updated version includes all **(x)** functions that were in AoE3Ed Viewer, a
 
 
 **(x) Currently the application does not include the following features:**
-* Converting DDT <-> TGA (it is recommended to use [Photoshop Plugin by kangcliff](http://aoe3.heavengames.com/cgi-bin/forums/display.cgi?action=ct&f=14,39229,,10)).
+* Converting DDT <- TGA (it is recommended to use [Photoshop Plugin by kangcliff](http://aoe3.heavengames.com/cgi-bin/forums/display.cgi?action=ct&f=14,39229,,10)).
 
 ## Latest Changes
 
-### Version 0.4
-* Added decryption of sounds (sound files can be extracted without problem now).
-* Added new GUI for extraction dialog.
-* Fixed bug with .xmb.xml extension while converted.
-* Added entry details window (in context menu in entries table).
+### Version 0.4.2
+* Added .DDT -> .TGA conversion.
+* Fixed problem of converting .XML files with unset extension.
+* Improved behavior of file open and save dialogs. Now each dialogue remembers its own path.
+Note: Last modified datetime is no longer available since BAR version 6, since this data was removed from the structure by the game developers.
 
 ## Screenshots
 
