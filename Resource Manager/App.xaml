@@ -1,0 +1,16 @@
+﻿<Application x:Class="Resource_Manager.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:Resource_Manager"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+<<<<<<< HEAD
+        <ResourceDictionary>
+            <FontFamily x:Key="Trajan Pro">pack://application:,,,/Fonts/#Trajan Pro 3</FontFamily>
+        </ResourceDictionary>
+=======
+        <FontFamily x:Key="Trajan Pro">pack://application:,,,/Fonts/#Trajan Pro</FontFamily>
+
+>>>>>>> 3f92ca114e5b86ed99edfd63366968ccb5d4834f
+    </Application.Resources>
+</Application>
