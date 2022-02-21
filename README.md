@@ -16,7 +16,7 @@
 *Utility for viewing, comparing, creating and extracting files from Age of Empires III .BAR archive*
 
 **Developer:** VladTheJunior and Kevsoft<br />
-**Current version:** 0.4.2<br />
+**Current version:** 0.4.3<br />
 [Download Portable (.zip archive)](https://github.com/KevinW1998/Resource-Manager/releases/latest/download/Resource-Manager.zip)<br />
 
 ## Table of Contents
@@ -65,6 +65,7 @@ The updated version includes all **(x)** functions that were in AoE3Ed Viewer, a
 **Extract:**
 * Extract all files.
 * Extract selected files.
+* Extract files to one folder.
 
 **Other:**
 * Comparison of BAR archives.
@@ -76,11 +77,9 @@ The updated version includes all **(x)** functions that were in AoE3Ed Viewer, a
 
 ## Latest Changes
 
-### Version 0.4.2
-* Added .DDT -> .TGA conversion.
-* Fixed problem of converting .XML files with unset extension.
-* Improved behavior of file open and save dialogs. Now each dialogue remembers its own path.
-Note: Last modified datetime is no longer available since BAR version 6, since this data was removed from the structure by the game developers.
+### Version 0.4.3
+* Added option to extract files to one direcory. (Useful to display files together at once and have a clear view in Windows Explorer.)
+* Added option to extract PNG images as BMP images. (Saving as BMP will remove the transparent part from PORTRAITS and replace it with the base texture that usually goes on top of the player color ingame).
 
 ## Screenshots
 
