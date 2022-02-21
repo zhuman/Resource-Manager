@@ -5,13 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Resource_Manager"
         mc:Ignorable="d"
-        SizeToContent="WidthAndHeight"
+        SizeToContent="Height"
         WindowStartupLocation="CenterScreen"
         UseLayoutRounding="True"
         ResizeMode="NoResize"
-        Title="Extraction Settings">
+        Title="Extraction Settings" Height="380" Width="660.8">
     <Window.Resources>
         <local:VisibilityConverter x:Key="VisibilityConverter" />
+        <local:ReverseVisibilityConverter x:Key="ReverseVisibilityConverter" />
     </Window.Resources>
     <Grid Margin="5" >
 
@@ -23,14 +24,18 @@
         </Grid.RowDefinitions>
         <GroupBox FontFamily="{StaticResource Trajan Pro}" FontSize="16" FontWeight="Bold"  Header="Common Settings:"  Margin="0,10" Grid.Row="0">
             <Grid VerticalAlignment="Stretch">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="auto"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="auto"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition/>
-                        <RowDefinition/>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="auto"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition Height="*" />
+                    <RowDefinition/>
+                    <RowDefinition Height="*" />
+                    <RowDefinition/>
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <TextBlock FontWeight="Normal" FontFamily="{StaticResource Trajan Pro}" FontSize="16"  HorizontalAlignment="Left" VerticalAlignment="Center" Text="Extraction path:"/>
@@ -38,8 +43,13 @@
                 <Button FontWeight="Normal" Width="100" Grid.Column="2" FontFamily="{StaticResource Trajan Pro}" FontSize="16" x:Name="NavigatePathButton" Click="NavigateButton_Click" Content="Browse..."/>
                 <CheckBox x:Name="cbDecompress" FontWeight="Normal" IsChecked="{Binding Path=AutoDecompress, Mode=TwoWay}" Grid.Row="1" Grid.ColumnSpan="3" FontFamily="{StaticResource Trajan Pro}" FontSize="16" Content="Auto decompress compressed files"/>
                 <TextBlock Visibility="{Binding ElementName=cbDecompress, Path=IsChecked, Converter={StaticResource VisibilityConverter}}" Grid.ColumnSpan="3" FontWeight="Normal" FontSize="12" Text="If you do not decompress them, you will not be able to open and edit these files." Grid.Row="2"   TextWrapping="Wrap" HorizontalAlignment="Left" Foreground="Red"  />
+                <CheckBox x:Name="cbOneDirectory" FontWeight="Normal" IsChecked="{Binding Path=OneFolder, Mode=TwoWay}" Grid.Row="3" Grid.ColumnSpan="3" FontFamily="{StaticResource Trajan Pro}" FontSize="16" Content="Extract files to one folder"/>
+                <TextBlock Visibility="{Binding ElementName=cbOneDirectory, Path=IsChecked, Converter={StaticResource ReverseVisibilityConverter}}" Grid.ColumnSpan="3" FontWeight="Normal" FontSize="12" Text="Useful to display files together at once and have a clear view in Windows Explorer." Grid.Row="4"   TextWrapping="Wrap" HorizontalAlignment="Left" Foreground="Red"  />
+                <CheckBox x:Name="cbSavePNGasBMP" FontWeight="Normal" IsChecked="{Binding Path=SavePNGasBMP, Mode=TwoWay}" Grid.Row="5" Grid.ColumnSpan="3" FontFamily="{StaticResource Trajan Pro}" FontSize="16" Content="Extract PNG images as BMP images"/>
+                <TextBlock Visibility="{Binding ElementName=cbSavePNGasBMP, Path=IsChecked, Converter={StaticResource VisibilityConverter}}" Grid.ColumnSpan="3" FontWeight="Normal" FontSize="12" Text="Saving as BMP will remove the transparent part and replace it with the base texture that usually goes on top of the player color ingame." Grid.Row="6"   TextWrapping="Wrap" HorizontalAlignment="Left" Foreground="Red"  />
+
             </Grid>
-            </GroupBox>
+        </GroupBox>
 
         <GroupBox FontFamily="{StaticResource Trajan Pro}" FontSize="16" FontWeight="Bold"  Header=".DDT Settings:"  Margin="0,10" Grid.Row="1">
             <Grid VerticalAlignment="Stretch">
@@ -70,8 +80,8 @@
             </Grid>
         </GroupBox>
         <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center">
-        <Button FontFamily="{StaticResource Trajan Pro}" FontSize="16" Margin="10,0"   Width="100" x:Name="ExportButton" Click="ExportButton_Click" Content="Extract"/>
-        <Button FontFamily="{StaticResource Trajan Pro}" FontSize="16"  Width="100"  x:Name="CancelButton" Click="CancelButton_Click" Content="Cancel"/>
+            <Button FontFamily="{StaticResource Trajan Pro}" FontSize="16" Margin="10,0"   Width="100" x:Name="ExportButton" Click="ExportButton_Click" Content="Extract"/>
+            <Button FontFamily="{StaticResource Trajan Pro}" FontSize="16"  Width="100"  x:Name="CancelButton" Click="CancelButton_Click" Content="Cancel"/>
         </StackPanel>
     </Grid>
 </Window>

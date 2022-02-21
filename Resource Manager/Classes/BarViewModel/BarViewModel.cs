@@ -161,7 +161,7 @@ namespace Archive_Unpacker.Classes.BarViewModel
 
 
 
-        public async Task saveFiles(List<BarEntry> files, string savePath, bool Decompress, CancellationToken token, bool convertDDTToPNG, bool convertDDTToTGA, bool convertXMB)
+        public async Task saveFiles(List<BarEntry> files, string savePath, bool Decompress, CancellationToken token, bool convertDDTToPNG, bool convertDDTToTGA, bool convertXMB, bool OneFolder, bool SavePNGasBMP)
         {
             ResetProgress();
             if (files.Count == 0) return;
@@ -185,7 +185,16 @@ namespace Archive_Unpacker.Classes.BarViewModel
                 // Locate the file within the BAR file.
                 input.Seek(file.Offset, SeekOrigin.Begin);
 
-                Directory.CreateDirectory(Path.Combine(savePath, Path.GetDirectoryName(file.FileNameWithRoot)));
+                if (OneFolder)
+                {
+                    Directory.CreateDirectory(Path.Combine(savePath, Path.GetPathRoot(file.FileNameWithRoot)));
+                }
+                else
+                {
+                    Directory.CreateDirectory(Path.Combine(savePath, Path.GetDirectoryName(file.FileNameWithRoot)));
+                }
+
+                
 
 
 
@@ -214,7 +223,34 @@ namespace Archive_Unpacker.Classes.BarViewModel
                     }
                 }
 
-                await File.WriteAllBytesAsync(Path.Combine(savePath, file.FileNameWithRoot), data);
+                if (file.Extension == ".PNG" && SavePNGasBMP)
+                {
+
+                    using var memory = new MemoryStream(data);
+                    System.Drawing.Image imgFile = System.Drawing.Image.FromStream(memory);
+                    
+                    if (OneFolder)
+                    {
+                        imgFile.Save(Path.ChangeExtension(Path.Combine(savePath, Path.GetPathRoot(file.FileNameWithRoot), file.fileNameWithoutPath), "bmp"), System.Drawing.Imaging.ImageFormat.Bmp);
+                    }
+                    else
+                    {
+                        imgFile.Save(Path.ChangeExtension(Path.Combine(savePath, file.FileNameWithRoot), "bmp"), System.Drawing.Imaging.ImageFormat.Bmp);
+                    }
+
+                }
+
+                if ((file.Extension != ".PNG" && SavePNGasBMP) || (file.Extension == ".PNG" && !SavePNGasBMP))
+                {
+                    if (OneFolder)
+                    {
+                        await File.WriteAllBytesAsync(Path.Combine(savePath, Path.GetPathRoot(file.FileNameWithRoot), file.fileNameWithoutPath), data);
+                    }
+                    else
+                    {
+                        await File.WriteAllBytesAsync(Path.Combine(savePath, file.FileNameWithRoot), data);
+                    }
+                }
 
 
 
@@ -234,19 +270,42 @@ namespace Archive_Unpacker.Classes.BarViewModel
                     XMBFile xmb = await XMBFile.LoadXMBFile(stream);
 
                     var newName = Path.ChangeExtension(Path.Combine(savePath, file.FileNameWithRoot), "");
+                    if (OneFolder)
+                    {
+                        newName = Path.ChangeExtension(Path.Combine(savePath, Path.GetPathRoot(file.FileNameWithRoot), file.fileNameWithoutPath), "");
+                    }
+
+
+                    
 
                     xmb.file.Save(newName);
                 }
 
                 if (file.Extension == ".DDT" && convertDDTToPNG)
                 {
-                    await DdtFileUtils.DdtBytes2PngAsync(data, Path.Combine(savePath, file.FileNameWithRoot));
+                    if (OneFolder)
+                    {
+                        await DdtFileUtils.DdtBytes2PngAsync(data, Path.Combine(savePath, Path.GetPathRoot(file.FileNameWithRoot), file.fileNameWithoutPath));
+                    }
+                    else
+                    {
+                        await DdtFileUtils.DdtBytes2PngAsync(data, Path.Combine(savePath, file.FileNameWithRoot));
+                    }
                 }
 
                 if (file.Extension == ".DDT" && convertDDTToTGA)
                 {
-                    await DdtFileUtils.DdtBytes2TgaAsync(data, Path.Combine(savePath, file.FileNameWithRoot));
+                    if (OneFolder)
+                    {
+                        await DdtFileUtils.DdtBytes2TgaAsync(data, Path.Combine(savePath, Path.GetPathRoot(file.FileNameWithRoot), file.fileNameWithoutPath));
+                    }
+                    else
+                    {
+                        await DdtFileUtils.DdtBytes2TgaAsync(data, Path.Combine(savePath, file.FileNameWithRoot));
+                    }
+                    
                 }
+
 
 
                 CurrentProgress += (double)file.FileSize2 / filesSize;
@@ -351,6 +410,17 @@ namespace Archive_Unpacker.Classes.BarViewModel
                         bitmap.Freeze();
                         memoryStream.Close();
                     }
+                    /*else if (file.Extension == ".PNG")
+                    {
+                        System.Drawing.Image image = System.Drawing.Image.FromStream(stream);
+                        using var memory = new MemoryStream();
+                        image.Save(memory, System.Drawing.Imaging.ImageFormat.Bmp);
+                        memory.Seek(0, SeekOrigin.Begin);
+                        bitmap.BeginInit();
+                        bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                        bitmap.StreamSource = memory;
+                        bitmap.EndInit();
+                    }*/
                     else
                     {
                         bitmap.BeginInit();
@@ -359,7 +429,9 @@ namespace Archive_Unpacker.Classes.BarViewModel
                         bitmap.EndInit();
                         bitmap.Freeze();
                     }
+
                 }
+
 
                 PreviewImage = bitmap;
                 return;

@@ -21,6 +21,8 @@ namespace Resource_Manager
         public string Path { get; set; } = "";
 
         private bool autoDecompress = true;
+        private bool oneFolder = false;
+        private bool savePNGasBMP = true;
         private bool autoXMBConversion = false;
         private bool autoDDTToPNGConversion = false;
         private bool autoDDTToTGAConversion = true;
@@ -72,6 +74,32 @@ namespace Resource_Manager
             set
             {
                 autoDecompress = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public bool SavePNGasBMP
+        {
+            get
+            {
+                return savePNGasBMP;
+            }
+            set
+            {
+                savePNGasBMP = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public bool OneFolder
+        {
+            get
+            {
+                return oneFolder;
+            }
+            set
+            {
+                oneFolder = value;
                 NotifyPropertyChanged();
             }
         }

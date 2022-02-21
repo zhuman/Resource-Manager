@@ -465,7 +465,7 @@ namespace Resource_Manager
 
                     await Task.Run(async () =>
                     {
-                        await file.saveFiles(entries, RootPath, decompress, Token, ExtractDialog.AutoDDTToPNGConversion, ExtractDialog.AutoDDTToTGAConversion, ExtractDialog.AutoXMBConversion);
+                        await file.saveFiles(entries, RootPath, decompress, Token, ExtractDialog.AutoDDTToPNGConversion, ExtractDialog.AutoDDTToTGAConversion, ExtractDialog.AutoXMBConversion, ExtractDialog.OneFolder, ExtractDialog.SavePNGasBMP);
                     });
 
                 }
@@ -542,7 +542,7 @@ namespace Resource_Manager
 
         private void TextBlock_MouseDown_1(object sender, MouseButtonEventArgs e)
         {
-           
+
             //await DdtFileUtils.Ddt2PngAsync(@"D:\Development\Resource Manager\Resource Manager\bin\Release\netcoreapp3.1\Art\ui\alerts\alert_treatyend_bump.ddt");
         }
 
@@ -860,6 +860,29 @@ namespace Resource_Manager
             if (value != null && value is bool)
             {
                 if ((bool)value == true)
+                {
+                    return Visibility.Collapsed;
+                }
+                else
+                { return Visibility.Visible; }
+            }
+
+            return value;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return null;
+        }
+    }
+
+    public class ReverseVisibilityConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value != null && value is bool)
+            {
+                if ((bool)value == false)
                 {
                     return Visibility.Collapsed;
                 }

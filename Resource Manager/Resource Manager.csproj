@@ -6,7 +6,7 @@
     <RootNamespace>Resource_Manager</RootNamespace>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
-    <Version>0.4.2</Version>
+    <Version>0.4.3</Version>
     <Authors>VladTheJunior</Authors>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <ApplicationIcon>icon.ico</ApplicationIcon>
