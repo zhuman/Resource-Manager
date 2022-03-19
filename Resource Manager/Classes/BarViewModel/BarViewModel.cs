@@ -185,23 +185,20 @@ namespace Archive_Unpacker.Classes.BarViewModel
                 // Locate the file within the BAR file.
                 input.Seek(file.Offset, SeekOrigin.Begin);
 
+
+                string ExtractPath = Path.Combine(savePath, file.FileNameWithRoot);
                 if (OneFolder)
                 {
-                    Directory.CreateDirectory(Path.Combine(savePath, Path.GetPathRoot(file.FileNameWithRoot)));
-                }
-                else
-                {
-                    Directory.CreateDirectory(Path.Combine(savePath, Path.GetDirectoryName(file.FileNameWithRoot)));
+                    ExtractPath = Path.Combine(savePath, file.fileNameWithoutPath);
                 }
 
-                
-
+                Directory.CreateDirectory(Path.GetDirectoryName(ExtractPath));
 
 
                 var data = new byte[file.FileSize2];
                 await input.ReadAsync(data, 0, data.Length);
 
-                 
+                // XMB and decompress 
                 if (file.Extension != ".XMB" && (L33TZipUtils.IsL33TZipFile(data) || Alz4Utils.IsAlz4File(data)) && Decompress)
                 {
                     if (Alz4Utils.IsAlz4File(data))
@@ -215,6 +212,7 @@ namespace Archive_Unpacker.Classes.BarViewModel
                     }
                 }
 
+                // WAV or MP3
                 if (file.Extension == ".WAV" || file.Extension == ".MP3")
                 {
                     if (file.isCompressed == 2)
@@ -223,37 +221,26 @@ namespace Archive_Unpacker.Classes.BarViewModel
                     }
                 }
 
+                // Save PNG as BMP, skip saving as PNG
                 if (file.Extension == ".PNG" && SavePNGasBMP)
                 {
 
                     using var memory = new MemoryStream(data);
                     System.Drawing.Image imgFile = System.Drawing.Image.FromStream(memory);
-                    
-                    if (OneFolder)
-                    {
-                        imgFile.Save(Path.ChangeExtension(Path.Combine(savePath, Path.GetPathRoot(file.FileNameWithRoot), file.fileNameWithoutPath), "bmp"), System.Drawing.Imaging.ImageFormat.Bmp);
-                    }
-                    else
-                    {
-                        imgFile.Save(Path.ChangeExtension(Path.Combine(savePath, file.FileNameWithRoot), "bmp"), System.Drawing.Imaging.ImageFormat.Bmp);
-                    }
+
+
+
+                    imgFile.Save(Path.ChangeExtension(ExtractPath, "bmp"), System.Drawing.Imaging.ImageFormat.Bmp);
+                    continue;
 
                 }
 
-                if ((file.Extension != ".PNG" && SavePNGasBMP) || (file.Extension == ".PNG" && !SavePNGasBMP))
-                {
-                    if (OneFolder)
-                    {
-                        await File.WriteAllBytesAsync(Path.Combine(savePath, Path.GetPathRoot(file.FileNameWithRoot), file.fileNameWithoutPath), data);
-                    }
-                    else
-                    {
-                        await File.WriteAllBytesAsync(Path.Combine(savePath, file.FileNameWithRoot), data);
-                    }
-                }
+
+                // Save data
+                await File.WriteAllBytesAsync(ExtractPath, data);
 
 
-
+                // Additionaly convert xmb
                 if (file.Extension == ".XMB" && convertXMB)
                 {
                     if (Alz4Utils.IsAlz4File(data))
@@ -269,41 +256,22 @@ namespace Archive_Unpacker.Classes.BarViewModel
                     using MemoryStream stream = new MemoryStream(data);
                     XMBFile xmb = await XMBFile.LoadXMBFile(stream);
 
-                    var newName = Path.ChangeExtension(Path.Combine(savePath, file.FileNameWithRoot), "");
-                    if (OneFolder)
-                    {
-                        newName = Path.ChangeExtension(Path.Combine(savePath, Path.GetPathRoot(file.FileNameWithRoot), file.fileNameWithoutPath), "");
-                    }
-
-
-                    
-
-                    xmb.file.Save(newName);
+                    xmb.file.Save(Path.ChangeExtension(ExtractPath, ""));
                 }
 
+
+                // Additionaly convert ddt to png
                 if (file.Extension == ".DDT" && convertDDTToPNG)
                 {
-                    if (OneFolder)
-                    {
-                        await DdtFileUtils.DdtBytes2PngAsync(data, Path.Combine(savePath, Path.GetPathRoot(file.FileNameWithRoot), file.fileNameWithoutPath));
-                    }
-                    else
-                    {
-                        await DdtFileUtils.DdtBytes2PngAsync(data, Path.Combine(savePath, file.FileNameWithRoot));
-                    }
-                }
 
+                    await DdtFileUtils.DdtBytes2PngAsync(data, ExtractPath);
+                }
+                // Additionaly convert ddt to tga
                 if (file.Extension == ".DDT" && convertDDTToTGA)
                 {
-                    if (OneFolder)
-                    {
-                        await DdtFileUtils.DdtBytes2TgaAsync(data, Path.Combine(savePath, Path.GetPathRoot(file.FileNameWithRoot), file.fileNameWithoutPath));
-                    }
-                    else
-                    {
-                        await DdtFileUtils.DdtBytes2TgaAsync(data, Path.Combine(savePath, file.FileNameWithRoot));
-                    }
-                    
+
+                    await DdtFileUtils.DdtBytes2TgaAsync(data, ExtractPath);
+
                 }
 
 

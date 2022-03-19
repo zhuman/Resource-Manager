@@ -63,15 +63,15 @@ namespace Resource_Manager.Classes.Bar
 
             if (version > 3)
             {
-                barEntry.FileSize2 = (int)fileInfo.Length;
+                
                 barEntry.isCompressed = 0;
-                barEntry.FileSize = barEntry.FileSize2;
+                barEntry.FileSize = (int)fileInfo.Length;
                 if (Alz4Utils.IsAlz4File(fileInfo.FullName))
                 {
                     barEntry.isCompressed = 1;
                     barEntry.FileSize = await Alz4Utils.ReadCompressedSizeAlz4Async(fileInfo.FullName);
                 }
-
+                barEntry.FileSize2 = (int)fileInfo.Length;
                 barEntry.FileSize3 = barEntry.FileSize2;
             }
             else
@@ -80,9 +80,8 @@ namespace Resource_Manager.Classes.Bar
                 barEntry.FileSize2 = barEntry.FileSize;
             }
 
-
-
-            barEntry.LastWriteTime = new BarEntryLastWriteTime(fileInfo.LastWriteTimeUtc);
+            barEntry.LastWriteTime = version < 6 ?
+                new BarEntryLastWriteTime(fileInfo.LastWriteTimeUtc) : new BarEntryLastWriteTime(DateTime.MinValue);
 
             return barEntry;
         }
@@ -168,12 +167,12 @@ namespace Resource_Manager.Classes.Bar
                     bw.Write(FileSize);
                     bw.Write(FileSize2);
 
-                    if (version == 5)
+                    if (version >= 5)
                     {
                         bw.Write(FileSize3);
                     }
-
-                    bw.Write(LastWriteTime.ToByteArray());
+                    if (version < 6)
+                        bw.Write(LastWriteTime.ToByteArray());
                     bw.Write(FileName.Length);
                     bw.Write(Encoding.Unicode.GetBytes(FileName));
                     if (version > 3)

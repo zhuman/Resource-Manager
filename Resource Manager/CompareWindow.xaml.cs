@@ -103,12 +103,35 @@ namespace Resource_Manager
             if (header.Tag == null) return;
             if (header.Tag.ToString() == "entryOld.isCompressed" || header.Tag.ToString() == "entryNew.isCompressed")
             {
-                minWidth = 40;
+                minWidth = 50;
             }
-            if (header.Tag.ToString() == "entryOld.FileNameWithRoot" || header.Tag.ToString() == "entryNew.FileNameWithRoot")
+            if (header.Tag.ToString() == "entryOld.FileNameWithRoot")
             {
-                minWidth = 195;
+
+                if (Bar1.barFile.barFileHeader.Version > 5)
+                {
+                    minWidth = 345;
+
+                }
+                else
+                {
+                    minWidth = 185;
+                }
             }
+            if (header.Tag.ToString() == "entryNew.FileNameWithRoot")
+            {
+
+                if (Bar2.barFile.barFileHeader.Version > 5)
+                {
+                    minWidth = 345;
+
+                }
+                else
+                {
+                    minWidth = 185;
+                }
+            }
+
             if (header.Tag.ToString() == "entryOld.FileSize2" || header.Tag.ToString() == "entryNew.FileSize2")
             {
                 minWidth = 130;
@@ -117,9 +140,29 @@ namespace Resource_Manager
             {
                 minWidth = 80;
             }
-            if (header.Tag.ToString() == "entryOld.lastModifiedDate" || header.Tag.ToString() == "entryNew.lastModifiedDate")
+            if (header.Tag.ToString() == "entryOld.lastModifiedDate")
             {
-                minWidth = 160;
+                if (Bar1.barFile.barFileHeader.Version > 5)
+                {
+                    minWidth = 0;
+
+                }
+                else
+                {
+                    minWidth = 160;
+                }
+            }
+            if (header.Tag.ToString() == "entryNew.lastModifiedDate")
+            {
+                if (Bar2.barFile.barFileHeader.Version > 5)
+                {
+                    minWidth = 0;
+
+                }
+                else
+                {
+                    minWidth = 160;
+                }
             }
             if (header.Column.ActualWidth < minWidth)
             {
@@ -241,6 +284,7 @@ namespace Resource_Manager
                 await Bar2.readFile(entryNew);
 
 
+
                 if (Bar1.Preview != null && Bar2.Preview != null)
                 {
                     try
@@ -304,7 +348,7 @@ namespace Resource_Manager
                         ImageViewer1.Visibility = Visibility.Visible;
                     }
                     else
-                    if (entryOld.Extension == ".BMP" || entryOld.Extension == ".PNG" || entryOld.Extension == ".CUR" || entryOld.Extension == ".JPG")
+                    if (entryOld.Extension == ".TGA" || entryOld.Extension == ".BMP" || entryOld.Extension == ".PNG" || entryOld.Extension == ".CUR" || entryOld.Extension == ".JPG")
                     {
                         ImagePreview1.Source = Bar1.PreviewImage;
                         XMLViewer1.Visibility = Visibility.Collapsed;
@@ -333,7 +377,7 @@ namespace Resource_Manager
                         ImageViewer2.Visibility = Visibility.Visible;
                     }
                     else
-                    if (entryNew.Extension == ".BMP" || entryNew.Extension == ".PNG" || entryNew.Extension == ".CUR" || entryNew.Extension == ".JPG")
+                    if (entryNew.Extension == ".TGA" || entryNew.Extension == ".BMP" || entryNew.Extension == ".PNG" || entryNew.Extension == ".CUR" || entryNew.Extension == ".JPG")
                     {
                         ImagePreview2.Source = Bar2.PreviewImage;
                         XMLViewer2.Visibility = Visibility.Collapsed;
@@ -393,6 +437,18 @@ namespace Resource_Manager
                 NotifyPropertyChanged("Bar1");
                 OldOpen.IsChecked = true;
 
+                if (Bar1.barFile.barFileHeader.Version > 5)
+                {
+                    gvcEntryOldlastModifiedDate.Width = 0;
+                    gvcEntryOldFileName.Width = 345;
+
+                }
+                else
+                {
+                    gvcEntryOldlastModifiedDate.Width = 160;
+                    gvcEntryOldFileName.Width = 185;
+                }
+
             }
             catch (Exception ex)
             {
@@ -438,6 +494,18 @@ namespace Resource_Manager
                 Bar2 = await BarViewModel.Load(filePath, true);
                 NotifyPropertyChanged("Bar2");
                 NewOpen.IsChecked = true;
+
+                if (Bar2.barFile.barFileHeader.Version > 5)
+                {
+                    gvcEntryNewlastModifiedDate.Width = 0;
+                    gvcEntryNewFileName.Width = 345;
+
+                }
+                else
+                {
+                    gvcEntryNewlastModifiedDate.Width = 160;
+                    gvcEntryNewFileName.Width = 185;
+                }
             }
             catch (Exception ex)
             {

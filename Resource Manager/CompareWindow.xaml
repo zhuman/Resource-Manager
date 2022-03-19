@@ -5,7 +5,6 @@
     xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:diffplex="clr-namespace:DiffPlex.Wpf.Controls;assembly=DiffPlex.Wpf"
-    xmlns:fa5="http://schemas.fontawesome.com/icons/"
     xmlns:local="clr-namespace:Resource_Manager"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Title="Resource Manager - BAR Comparer"
@@ -19,6 +18,27 @@
     WindowStyle="SingleBorderWindow"
     mc:Ignorable="d">
     <Window.Resources>
+        <ControlTemplate x:Key="Spinner">
+            <Grid>
+                <Rectangle Width="16" Height="16" RenderTransformOrigin="0.5,0.5">
+                    <Rectangle.Fill>
+                        <ImageBrush ImageSource="/resources/loadingspinner.png" />
+                    </Rectangle.Fill>
+                    <Rectangle.RenderTransform>
+                        <RotateTransform />
+                    </Rectangle.RenderTransform>
+                    <Rectangle.Triggers>
+                        <EventTrigger RoutedEvent="Loaded">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation Storyboard.TargetProperty="(Rectangle.RenderTransform).(RotateTransform.Angle)" To="360" Duration="0:0:1" RepeatBehavior="Forever" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </Rectangle.Triggers>
+                </Rectangle>
+            </Grid>
+        </ControlTemplate>
         <local:RunEnabledColorConverter x:Key="RunEnabledColorConverter" />
         <Style x:Key="GridSplitterVerticalGripStyle" TargetType="{x:Type GridSplitter}">
             <Setter Property="VerticalAlignment" Value="Stretch" />
@@ -117,16 +137,12 @@
                 <MenuItem.Header>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock x:Name="tbFile" Text="Open" />
-                        <fa5:SvgAwesome
-                            x:Name="SpinnerFile1"
+                        <ContentControl  x:Name="SpinnerFile1"
                             Width="16"
                             Margin="3,0,0,0"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
-                            Icon="Solid_Spinner"
-                            Spin="True"
-                            SpinDuration="2"
-                            Visibility="Collapsed" />
+                            Visibility="Collapsed" Template="{StaticResource Spinner}" />
                     </StackPanel>
 
                 </MenuItem.Header>
@@ -144,16 +160,14 @@
                 <MenuItem.Header>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock x:Name="tbCompare" Text="Compare" />
-                        <fa5:SvgAwesome
-                            x:Name="SpinnerFile2"
+                        <ContentControl x:Name="SpinnerFile2"
                             Width="16"
                             Margin="3,0,0,0"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
-                            Icon="Solid_Spinner"
-                            Spin="True"
-                            SpinDuration="2"
-                            Visibility="Collapsed" />
+                           
+                            Visibility="Collapsed" Template="{StaticResource Spinner}" />
+                     
                     </StackPanel>
                 </MenuItem.Header>
 
@@ -281,13 +295,13 @@
                 </ListView.ItemContainerStyle>
                 <ListView.View>
                     <GridView AllowsColumnReorder="False">
-                        <GridViewColumn Width="40">
+                        <GridViewColumn Width="50">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <Rectangle
-                                        x:Name="myImage"
-                                        Width="16"
-                                        Height="16" />
+                                    x:Name="myImage"
+                                    Width="16"
+                                    Height="16" />
                                     <DataTemplate.Triggers>
                                         <DataTrigger Binding="{Binding entryOld.isCompressed}" Value="2">
                                             <Setter TargetName="myImage" Property="Fill">
@@ -297,11 +311,7 @@
                                                         <DrawingBrush.Drawing>
                                                             <DrawingGroup>
                                                                 <DrawingGroup.Children>
-                                                                    <GeometryDrawing Brush="#00FFFFFF" Geometry="F1M0,0L16,0 16,16 0,16z" />
-                                                                    <GeometryDrawing Brush="#FFF6F6F6" Geometry="F1M1.5,1L9.61,1 10.61,3 13.496,3C14.323,3,14.996,3.673,14.996,4.5L14.996,12.5C14.996,13.327,14.323,14,13.496,14L1.5,14C0.673,14,0,13.327,0,12.5L0,2.5C0,1.673,0.673,1,1.5,1" />
-                                                                    <GeometryDrawing Brush="#FFDCB67A" Geometry="F1M2,3L8.374,3 8.874,4 2,4z M13.496,4L10,4 9.992,4 8.992,2 1.5,2C1.225,2,1,2.224,1,2.5L1,12.5C1,12.776,1.225,13,1.5,13L13.496,13C13.773,13,13.996,12.776,13.996,12.5L13.996,4.5C13.996,4.224,13.773,4,13.496,4" />
-                                                                    <GeometryDrawing Brush="#FFEFEFF0" Geometry="F1M4,12L3,12 3,13 4,13z M5,11L4,11 4,12 5,12z M5,9L4,9 4,10 5,10z M4,10L3,10 3,11 4,11z M4,8L3,8 3,9 4,9z M5,7L4,7 4,8 5,8z M5,4L3,4 3,6 5,6z M2,3L8.374,3 8.874,4 2,4z" />
-                                                                    <GeometryDrawing Brush="#FF424242" Geometry="F1M5,4L5,6 3,6 3,4 2,4 2,13 3,13 3,12 4,12 4,11 3,11 3,10 4,10 4,9 3,9 3,8 4,8 4,7 5,7 5,8 4,8 4,9 5,9 5,10 4,10 4,11 5,11 5,12 4,12 4,13 6,13 6,4z M5,4L3,4 3,3 5,3z" />
+                                                                    <GeometryDrawing Brush="Black" Geometry="M20 18H4V8H20M20 6H12L10 4H4C2.9 4 2 4.9 2 6V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V8C22 6.9 21.1 6 20 6M12.8 12C12.4 10.8 11.3 10 10 10C8.3 10 7 11.3 7 13S8.3 16 10 16C11.3 16 12.4 15.2 12.8 14H15V16H17V14H19V12H12.8M10 14C9.4 14 9 13.6 9 13C9 12.4 9.4 12 10 12S11 12.4 11 13 10.6 14 10 14Z" />
                                                                 </DrawingGroup.Children>
                                                             </DrawingGroup>
                                                         </DrawingBrush.Drawing>
@@ -318,11 +328,7 @@
                                                         <DrawingBrush.Drawing>
                                                             <DrawingGroup>
                                                                 <DrawingGroup.Children>
-                                                                    <GeometryDrawing Brush="#00FFFFFF" Geometry="F1M0,0L16,0 16,16 0,16z" />
-                                                                    <GeometryDrawing Brush="#FFF6F6F6" Geometry="F1M1.5,1L9.61,1 10.61,3 13.496,3C14.323,3,14.996,3.673,14.996,4.5L14.996,12.5C14.996,13.327,14.323,14,13.496,14L1.5,14C0.673,14,0,13.327,0,12.5L0,2.5C0,1.673,0.673,1,1.5,1" />
-                                                                    <GeometryDrawing Brush="#FFDCB67A" Geometry="F1M2,3L8.374,3 8.874,4 2,4z M13.496,4L10,4 9.992,4 8.992,2 1.5,2C1.225,2,1,2.224,1,2.5L1,12.5C1,12.776,1.225,13,1.5,13L13.496,13C13.773,13,13.996,12.776,13.996,12.5L13.996,4.5C13.996,4.224,13.773,4,13.496,4" />
-                                                                    <GeometryDrawing Brush="#FFEFEFF0" Geometry="F1M4,12L3,12 3,13 4,13z M5,11L4,11 4,12 5,12z M5,9L4,9 4,10 5,10z M4,10L3,10 3,11 4,11z M4,8L3,8 3,9 4,9z M5,7L4,7 4,8 5,8z M5,4L3,4 3,6 5,6z M2,3L8.374,3 8.874,4 2,4z" />
-                                                                    <GeometryDrawing Brush="#FF424242" Geometry="F1M5,4L5,6 3,6 3,4 2,4 2,13 3,13 3,12 4,12 4,11 3,11 3,10 4,10 4,9 3,9 3,8 4,8 4,7 5,7 5,8 4,8 4,9 5,9 5,10 4,10 4,11 5,11 5,12 4,12 4,13 6,13 6,4z M5,4L3,4 3,3 5,3z" />
+                                                                    <GeometryDrawing Brush="Black" Geometry="M20 6H12L10 4H4C2.9 4 2 4.9 2 6V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V8C22 6.9 21.1 6 20 6M20 18H16V16H14V18H4V8H14V10H16V8H20V18M16 12V10H18V12H16M14 12H16V14H14V12M18 16H16V14H18V16Z" />
                                                                 </DrawingGroup.Children>
                                                             </DrawingGroup>
                                                         </DrawingBrush.Drawing>
@@ -340,37 +346,55 @@
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                             <GridViewColumn.Header>
-                                <GridViewColumnHeader Click="files_Click" Tag="entryOld.isCompressed">
+                                <GridViewColumnHeader Click="files_Click" Tag="isCompressed">
+                                    <TextBlock>
+                                <Viewbox
+                                    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                                    Width="16"
+                                    Height="16"
+                                    Margin="1,0">
+                                    <Rectangle Width="16" Height="16">
+                                        <Rectangle.Fill>
+                                            <DrawingBrush>
+                                                <DrawingBrush.Drawing>
+                                                    <DrawingGroup>
+                                                        <DrawingGroup.Children>
+                                                               <GeometryDrawing Brush="Black" Geometry="M20 6H12L10 4H4C2.9 4 2 4.9 2 6V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V8C22 6.9 21.1 6 20 6M20 18H16V16H14V18H4V8H14V10H16V8H20V18M16 12V10H18V12H16M14 12H16V14H14V12M18 16H16V14H18V16Z" />
+                                                        </DrawingGroup.Children>
+                                                    </DrawingGroup>
+                                                </DrawingBrush.Drawing>
+                                            </DrawingBrush>
+                                        </Rectangle.Fill>
+                                    </Rectangle>
+                                </Viewbox>
+                                <Viewbox
+                                    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                                    Width="16"
+                                    Height="16"
+                                    Margin="1,0">
+                                    <Rectangle Width="16" Height="16">
+                                        <Rectangle.Fill>
+                                            <DrawingBrush>
+                                                <DrawingBrush.Drawing>
+                                                    <DrawingGroup>
+                                                        <DrawingGroup.Children>
+                                                               <GeometryDrawing Brush="Black" Geometry="M20 18H4V8H20M20 6H12L10 4H4C2.9 4 2 4.9 2 6V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V8C22 6.9 21.1 6 20 6M12.8 12C12.4 10.8 11.3 10 10 10C8.3 10 7 11.3 7 13S8.3 16 10 16C11.3 16 12.4 15.2 12.8 14H15V16H17V14H19V12H12.8M10 14C9.4 14 9 13.6 9 13C9 12.4 9.4 12 10 12S11 12.4 11 13 10.6 14 10 14Z" />
+                                                         </DrawingGroup.Children>
+                                                    </DrawingGroup>
+                                                </DrawingBrush.Drawing>
+                                            </DrawingBrush>
+                                        </Rectangle.Fill>
+                                    </Rectangle>
+                                </Viewbox>
 
-                                    <Viewbox
-                                        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                                        Width="16"
-                                        Height="16"
-                                        Margin="1,0">
-                                        <Rectangle Width="16" Height="16">
-                                            <Rectangle.Fill>
-                                                <DrawingBrush>
-                                                    <DrawingBrush.Drawing>
-                                                        <DrawingGroup>
-                                                            <DrawingGroup.Children>
-                                                                <GeometryDrawing Brush="#00FFFFFF" Geometry="F1M0,0L16,0 16,16 0,16z" />
-                                                                <GeometryDrawing Brush="#FFF6F6F6" Geometry="F1M1.5,1L9.61,1 10.61,3 13.496,3C14.323,3,14.996,3.673,14.996,4.5L14.996,12.5C14.996,13.327,14.323,14,13.496,14L1.5,14C0.673,14,0,13.327,0,12.5L0,2.5C0,1.673,0.673,1,1.5,1" />
-                                                                <GeometryDrawing Brush="#FFDCB67A" Geometry="F1M2,3L8.374,3 8.874,4 2,4z M13.496,4L10,4 9.992,4 8.992,2 1.5,2C1.225,2,1,2.224,1,2.5L1,12.5C1,12.776,1.225,13,1.5,13L13.496,13C13.773,13,13.996,12.776,13.996,12.5L13.996,4.5C13.996,4.224,13.773,4,13.496,4" />
-                                                                <GeometryDrawing Brush="#FFEFEFF0" Geometry="F1M4,12L3,12 3,13 4,13z M5,11L4,11 4,12 5,12z M5,9L4,9 4,10 5,10z M4,10L3,10 3,11 4,11z M4,8L3,8 3,9 4,9z M5,7L4,7 4,8 5,8z M5,4L3,4 3,6 5,6z M2,3L8.374,3 8.874,4 2,4z" />
-                                                                <GeometryDrawing Brush="#FF424242" Geometry="F1M5,4L5,6 3,6 3,4 2,4 2,13 3,13 3,12 4,12 4,11 3,11 3,10 4,10 4,9 3,9 3,8 4,8 4,7 5,7 5,8 4,8 4,9 5,9 5,10 4,10 4,11 5,11 5,12 4,12 4,13 6,13 6,4z M5,4L3,4 3,3 5,3z" />
-                                                            </DrawingGroup.Children>
-                                                        </DrawingGroup>
-                                                    </DrawingBrush.Drawing>
-                                                </DrawingBrush>
-                                            </Rectangle.Fill>
-                                        </Rectangle>
-                                    </Viewbox>
+                                    </TextBlock>
                                 </GridViewColumnHeader>
                             </GridViewColumn.Header>
                         </GridViewColumn>
-                        <GridViewColumn Width="195">
+                        <GridViewColumn x:Name="gvcEntryOldFileName" Width="185">
                             <GridViewColumn.Header>
                                 <GridViewColumnHeader
+                                    
                                     Click="files_Click"
                                     Content="File Name"
                                     Tag="entryOld.FileNameWithRoot" />
@@ -419,10 +443,11 @@
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
 
-                        <GridViewColumn Width="160">
+                        <GridViewColumn x:Name="gvcEntryOldlastModifiedDate" Width="160">
                             <GridViewColumn.Header>
                                 <GridViewColumnHeader
                                     Click="files_Click"
+                                    
                                     Content="Last Modified date"
                                     Tag="entryOld.lastModifiedDate" />
                             </GridViewColumn.Header>
@@ -446,13 +471,13 @@
 
 
 
-                        <GridViewColumn Width="40">
+                        <GridViewColumn Width="50">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <Rectangle
-                                        x:Name="myImage"
-                                        Width="16"
-                                        Height="16" />
+                                    x:Name="myImage"
+                                    Width="16"
+                                    Height="16" />
                                     <DataTemplate.Triggers>
                                         <DataTrigger Binding="{Binding entryNew.isCompressed}" Value="2">
                                             <Setter TargetName="myImage" Property="Fill">
@@ -462,11 +487,7 @@
                                                         <DrawingBrush.Drawing>
                                                             <DrawingGroup>
                                                                 <DrawingGroup.Children>
-                                                                    <GeometryDrawing Brush="#00FFFFFF" Geometry="F1M0,0L16,0 16,16 0,16z" />
-                                                                    <GeometryDrawing Brush="#FFF6F6F6" Geometry="F1M1.5,1L9.61,1 10.61,3 13.496,3C14.323,3,14.996,3.673,14.996,4.5L14.996,12.5C14.996,13.327,14.323,14,13.496,14L1.5,14C0.673,14,0,13.327,0,12.5L0,2.5C0,1.673,0.673,1,1.5,1" />
-                                                                    <GeometryDrawing Brush="#FFDCB67A" Geometry="F1M2,3L8.374,3 8.874,4 2,4z M13.496,4L10,4 9.992,4 8.992,2 1.5,2C1.225,2,1,2.224,1,2.5L1,12.5C1,12.776,1.225,13,1.5,13L13.496,13C13.773,13,13.996,12.776,13.996,12.5L13.996,4.5C13.996,4.224,13.773,4,13.496,4" />
-                                                                    <GeometryDrawing Brush="#FFEFEFF0" Geometry="F1M4,12L3,12 3,13 4,13z M5,11L4,11 4,12 5,12z M5,9L4,9 4,10 5,10z M4,10L3,10 3,11 4,11z M4,8L3,8 3,9 4,9z M5,7L4,7 4,8 5,8z M5,4L3,4 3,6 5,6z M2,3L8.374,3 8.874,4 2,4z" />
-                                                                    <GeometryDrawing Brush="#FF424242" Geometry="F1M5,4L5,6 3,6 3,4 2,4 2,13 3,13 3,12 4,12 4,11 3,11 3,10 4,10 4,9 3,9 3,8 4,8 4,7 5,7 5,8 4,8 4,9 5,9 5,10 4,10 4,11 5,11 5,12 4,12 4,13 6,13 6,4z M5,4L3,4 3,3 5,3z" />
+                                                                    <GeometryDrawing Brush="Black" Geometry="M20 18H4V8H20M20 6H12L10 4H4C2.9 4 2 4.9 2 6V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V8C22 6.9 21.1 6 20 6M12.8 12C12.4 10.8 11.3 10 10 10C8.3 10 7 11.3 7 13S8.3 16 10 16C11.3 16 12.4 15.2 12.8 14H15V16H17V14H19V12H12.8M10 14C9.4 14 9 13.6 9 13C9 12.4 9.4 12 10 12S11 12.4 11 13 10.6 14 10 14Z" />
                                                                 </DrawingGroup.Children>
                                                             </DrawingGroup>
                                                         </DrawingBrush.Drawing>
@@ -483,11 +504,7 @@
                                                         <DrawingBrush.Drawing>
                                                             <DrawingGroup>
                                                                 <DrawingGroup.Children>
-                                                                    <GeometryDrawing Brush="#00FFFFFF" Geometry="F1M0,0L16,0 16,16 0,16z" />
-                                                                    <GeometryDrawing Brush="#FFF6F6F6" Geometry="F1M1.5,1L9.61,1 10.61,3 13.496,3C14.323,3,14.996,3.673,14.996,4.5L14.996,12.5C14.996,13.327,14.323,14,13.496,14L1.5,14C0.673,14,0,13.327,0,12.5L0,2.5C0,1.673,0.673,1,1.5,1" />
-                                                                    <GeometryDrawing Brush="#FFDCB67A" Geometry="F1M2,3L8.374,3 8.874,4 2,4z M13.496,4L10,4 9.992,4 8.992,2 1.5,2C1.225,2,1,2.224,1,2.5L1,12.5C1,12.776,1.225,13,1.5,13L13.496,13C13.773,13,13.996,12.776,13.996,12.5L13.996,4.5C13.996,4.224,13.773,4,13.496,4" />
-                                                                    <GeometryDrawing Brush="#FFEFEFF0" Geometry="F1M4,12L3,12 3,13 4,13z M5,11L4,11 4,12 5,12z M5,9L4,9 4,10 5,10z M4,10L3,10 3,11 4,11z M4,8L3,8 3,9 4,9z M5,7L4,7 4,8 5,8z M5,4L3,4 3,6 5,6z M2,3L8.374,3 8.874,4 2,4z" />
-                                                                    <GeometryDrawing Brush="#FF424242" Geometry="F1M5,4L5,6 3,6 3,4 2,4 2,13 3,13 3,12 4,12 4,11 3,11 3,10 4,10 4,9 3,9 3,8 4,8 4,7 5,7 5,8 4,8 4,9 5,9 5,10 4,10 4,11 5,11 5,12 4,12 4,13 6,13 6,4z M5,4L3,4 3,3 5,3z" />
+                                                                    <GeometryDrawing Brush="Black" Geometry="M20 6H12L10 4H4C2.9 4 2 4.9 2 6V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V8C22 6.9 21.1 6 20 6M20 18H16V16H14V18H4V8H14V10H16V8H20V18M16 12V10H18V12H16M14 12H16V14H14V12M18 16H16V14H18V16Z" />
                                                                 </DrawingGroup.Children>
                                                             </DrawingGroup>
                                                         </DrawingBrush.Drawing>
@@ -505,37 +522,55 @@
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                             <GridViewColumn.Header>
-                                <GridViewColumnHeader Click="files_Click" Tag="entryNew.isCompressed">
+                                <GridViewColumnHeader Click="files_Click" Tag="isCompressed">
+                                    <TextBlock>
+                                <Viewbox
+                                    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                                    Width="16"
+                                    Height="16"
+                                    Margin="1,0">
+                                    <Rectangle Width="16" Height="16">
+                                        <Rectangle.Fill>
+                                            <DrawingBrush>
+                                                <DrawingBrush.Drawing>
+                                                    <DrawingGroup>
+                                                        <DrawingGroup.Children>
+                                                               <GeometryDrawing Brush="Black" Geometry="M20 6H12L10 4H4C2.9 4 2 4.9 2 6V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V8C22 6.9 21.1 6 20 6M20 18H16V16H14V18H4V8H14V10H16V8H20V18M16 12V10H18V12H16M14 12H16V14H14V12M18 16H16V14H18V16Z" />
+                                                        </DrawingGroup.Children>
+                                                    </DrawingGroup>
+                                                </DrawingBrush.Drawing>
+                                            </DrawingBrush>
+                                        </Rectangle.Fill>
+                                    </Rectangle>
+                                </Viewbox>
+                                <Viewbox
+                                    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                                    Width="16"
+                                    Height="16"
+                                    Margin="1,0">
+                                    <Rectangle Width="16" Height="16">
+                                        <Rectangle.Fill>
+                                            <DrawingBrush>
+                                                <DrawingBrush.Drawing>
+                                                    <DrawingGroup>
+                                                        <DrawingGroup.Children>
+                                                               <GeometryDrawing Brush="Black" Geometry="M20 18H4V8H20M20 6H12L10 4H4C2.9 4 2 4.9 2 6V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V8C22 6.9 21.1 6 20 6M12.8 12C12.4 10.8 11.3 10 10 10C8.3 10 7 11.3 7 13S8.3 16 10 16C11.3 16 12.4 15.2 12.8 14H15V16H17V14H19V12H12.8M10 14C9.4 14 9 13.6 9 13C9 12.4 9.4 12 10 12S11 12.4 11 13 10.6 14 10 14Z" />
+                                                         </DrawingGroup.Children>
+                                                    </DrawingGroup>
+                                                </DrawingBrush.Drawing>
+                                            </DrawingBrush>
+                                        </Rectangle.Fill>
+                                    </Rectangle>
+                                </Viewbox>
 
-                                    <Viewbox
-                                        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                                        Width="16"
-                                        Height="16"
-                                        Margin="1,0">
-                                        <Rectangle Width="16" Height="16">
-                                            <Rectangle.Fill>
-                                                <DrawingBrush>
-                                                    <DrawingBrush.Drawing>
-                                                        <DrawingGroup>
-                                                            <DrawingGroup.Children>
-                                                                <GeometryDrawing Brush="#00FFFFFF" Geometry="F1M0,0L16,0 16,16 0,16z" />
-                                                                <GeometryDrawing Brush="#FFF6F6F6" Geometry="F1M1.5,1L9.61,1 10.61,3 13.496,3C14.323,3,14.996,3.673,14.996,4.5L14.996,12.5C14.996,13.327,14.323,14,13.496,14L1.5,14C0.673,14,0,13.327,0,12.5L0,2.5C0,1.673,0.673,1,1.5,1" />
-                                                                <GeometryDrawing Brush="#FFDCB67A" Geometry="F1M2,3L8.374,3 8.874,4 2,4z M13.496,4L10,4 9.992,4 8.992,2 1.5,2C1.225,2,1,2.224,1,2.5L1,12.5C1,12.776,1.225,13,1.5,13L13.496,13C13.773,13,13.996,12.776,13.996,12.5L13.996,4.5C13.996,4.224,13.773,4,13.496,4" />
-                                                                <GeometryDrawing Brush="#FFEFEFF0" Geometry="F1M4,12L3,12 3,13 4,13z M5,11L4,11 4,12 5,12z M5,9L4,9 4,10 5,10z M4,10L3,10 3,11 4,11z M4,8L3,8 3,9 4,9z M5,7L4,7 4,8 5,8z M5,4L3,4 3,6 5,6z M2,3L8.374,3 8.874,4 2,4z" />
-                                                                <GeometryDrawing Brush="#FF424242" Geometry="F1M5,4L5,6 3,6 3,4 2,4 2,13 3,13 3,12 4,12 4,11 3,11 3,10 4,10 4,9 3,9 3,8 4,8 4,7 5,7 5,8 4,8 4,9 5,9 5,10 4,10 4,11 5,11 5,12 4,12 4,13 6,13 6,4z M5,4L3,4 3,3 5,3z" />
-                                                            </DrawingGroup.Children>
-                                                        </DrawingGroup>
-                                                    </DrawingBrush.Drawing>
-                                                </DrawingBrush>
-                                            </Rectangle.Fill>
-                                        </Rectangle>
-                                    </Viewbox>
+                                    </TextBlock>
                                 </GridViewColumnHeader>
                             </GridViewColumn.Header>
                         </GridViewColumn>
-                        <GridViewColumn Width="195">
+                        <GridViewColumn x:Name="gvcEntryNewFileName" Width="185">
                             <GridViewColumn.Header>
                                 <GridViewColumnHeader
+                                    
                                     Click="files_Click"
                                     Content="File Name"
                                     Tag="entryNew.FileNameWithRoot" />
@@ -584,10 +619,11 @@
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
 
-                        <GridViewColumn Width="160">
+                        <GridViewColumn x:Name="gvcEntryNewlastModifiedDate" Width="160">
                             <GridViewColumn.Header>
                                 <GridViewColumnHeader
                                     Click="files_Click"
+                                    
                                     Content="Last Modified date"
                                     Tag="entryNew.lastModifiedDate" />
                             </GridViewColumn.Header>

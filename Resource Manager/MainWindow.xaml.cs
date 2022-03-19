@@ -430,12 +430,24 @@ namespace Resource_Manager
         private async void extractMenuItem(object sender, RoutedEventArgs e)
         {
             if (file == null) return;
-            List<BarEntry> entries;
-            if ((sender as MenuItem).Tag.ToString() == "Selected")
-                entries = files.SelectedItems.Cast<BarEntry>().ToList();
-            else
-                entries = file.barFile.BarFileEntrys.ToList();
-
+             List<BarEntry> entries;
+             if ((sender as MenuItem).Tag.ToString() == "Selected")
+                 entries = files.SelectedItems.Cast<BarEntry>().ToList();
+             else
+                 entries = file.SourceCollection.Cast<BarEntry>().ToList();
+            /*
+              List<BarEntry> entries = new List<BarEntry>();
+               List<string> icons = new List<string>(await File.ReadAllLinesAsync(@"C:\Users\vladt\Desktop\icons.txt"));
+               icons.ForEach(x =>
+               {
+                   var a = file.barFile.BarFileEntrys.FirstOrDefault(a => a.FileNameWithRoot.ToLower() == "data\\wpfg\\" + x.Replace('/', '\\').ToLower());
+                   if (a != null)
+                       entries.Add(a);
+                   else
+                       Debug.WriteLine(x);
+                   }
+               );
+                */
 
             if (entries.Count != 0)
             {
@@ -847,6 +859,16 @@ namespace Resource_Manager
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             WindowState = WindowState.Minimized;
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            var args = Environment.GetCommandLineArgs();
+            if (args.Length > 1 && Path.GetExtension(args[1]).ToUpper() == ".BAR")
+            {
+                openFile(args[1]);
+            }
+            
         }
     }
 

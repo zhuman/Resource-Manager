@@ -35,7 +35,7 @@
                 <Run Text="Copyright (c) 2020-2022 VladTheJunior"  FontSize="14"/>
 
                 <LineBreak/>
-                <Run Text="version: 0.4.3"  FontSize="14"/>
+                <Run Text="version: 0.4.4"  FontSize="14"/>
             </TextBlock>
             <TextBlock  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" >
             <LineBreak/>

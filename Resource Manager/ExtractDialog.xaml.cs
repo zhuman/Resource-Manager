@@ -22,7 +22,7 @@ namespace Resource_Manager
 
         private bool autoDecompress = true;
         private bool oneFolder = false;
-        private bool savePNGasBMP = true;
+        private bool savePNGasBMP = false;
         private bool autoXMBConversion = false;
         private bool autoDDTToPNGConversion = false;
         private bool autoDDTToTGAConversion = true;
