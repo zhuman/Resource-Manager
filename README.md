@@ -16,12 +16,10 @@
 *Utility for viewing, comparing, creating and extracting files from Age of Empires III .BAR archive*
 
 **Developer:** VladTheJunior and Kevsoft<br />
-**Current version:** 0.4.3<br />
-[Download Portable (.zip archive)](https://github.com/KevinW1998/Resource-Manager/releases/latest/download/Resource-Manager.zip)<br />
+**Current version:** 0.4.4<br />
+[Download Installer from Google Drive](https://drive.google.com/file/d/1iNoxk92WHFlgdtUtiWxXhCKpMUcmhOgn/view?usp=sharing)<br />
 
 ## Table of Contents
-
-* [How to Use](#how-to-use)
 * [About the Project](#about-the-project)
 * [Latest Changes](#latest-changes)
 * [Screenshots](#screenshots)
@@ -29,19 +27,10 @@
 * [Contact](#contact)
 * [Acknowledgements](#acknowledgements)
 
-## How to Use
-
-1. Download application from the link above.
-
-### For Portable version
-
-2. Unpack .zip and run *Resource Manager.exe*.
-3. Application requires .NET Core. If you haven't installed it yet, you can download it from the direct link: [.NET Core Runtime](https://dotnet.microsoft.com/download/dotnet-core/thank-you/runtime-desktop-3.1.9-windows-x64-installer).
-
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-I would like to present to you a program for viewing, comparing, creating and extracting files from BAR archives of the Age of Empires 3: Definitive Edition (also supports AoE3 2007). This tool replaces the AoE3Ed Viewer developed by Ykkrosh, which does not work for the Definitive Edition.
+I would like to present to you a program for viewing, comparing, creating and extracting files from BAR archives of the Age of Empires 3: Definitive Edition (also supports AoE3 Legacy). This tool replaces the AoE3Ed Viewer developed by Ykkrosh, which does not work for the Definitive Edition.
 The updated version includes all **(x)** functions that were in AoE3Ed Viewer, as well as new features:
 
 **Preview:**
@@ -58,7 +47,7 @@ The updated version includes all **(x)** functions that were in AoE3Ed Viewer, a
 * Detail of entry file.
 
 **Conversion:**
-* Converting XML <-> XMB (both 2007 and DE).
+* Converting XML <-> XMB (both Legacy and DE).
 * Converting DDT -> PNG.
 * Converting DDT -> TGA.
 
@@ -77,9 +66,14 @@ The updated version includes all **(x)** functions that were in AoE3Ed Viewer, a
 
 ## Latest Changes
 
-### Version 0.4.3
-* Added option to extract files to one direcory. (Useful to display files together at once and have a clear view in Windows Explorer.)
-* Added option to extract PNG images as BMP images. (Saving as BMP will remove the transparent part from PORTRAITS and replace it with the base texture that usually goes on top of the player color ingame).
+### Version 0.4.4
+* Changed option to extract PNG images as BMP images. Now it disabled by default.
+* Fixed BAR file creation for the latest BAR file version. 
+* Fixed files extraction.
+* Added different icons for compressed and encrypted BAR entries.
+* Added file association with .bar extension in Windows Explorer.
+* Added auto updater.
+* Migrated from .NET Core 3.1 to .NET 6
 
 ## Screenshots
 
