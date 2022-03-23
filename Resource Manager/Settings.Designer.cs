@@ -71,5 +71,77 @@ namespace Resource_Manager {
                 this["lastExportedPath"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool ExtractionAutoDecompress {
+            get {
+                return ((bool)(this["ExtractionAutoDecompress"]));
+            }
+            set {
+                this["ExtractionAutoDecompress"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ExtractionOneFolder {
+            get {
+                return ((bool)(this["ExtractionOneFolder"]));
+            }
+            set {
+                this["ExtractionOneFolder"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ExtractionSavePNGasBMP {
+            get {
+                return ((bool)(this["ExtractionSavePNGasBMP"]));
+            }
+            set {
+                this["ExtractionSavePNGasBMP"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ExtractionAutoXMBConversion {
+            get {
+                return ((bool)(this["ExtractionAutoXMBConversion"]));
+            }
+            set {
+                this["ExtractionAutoXMBConversion"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ExtractionAutoDDTToPNGConversion {
+            get {
+                return ((bool)(this["ExtractionAutoDDTToPNGConversion"]));
+            }
+            set {
+                this["ExtractionAutoDDTToPNGConversion"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool ExtractionAutoDDTToTGAConversion {
+            get {
+                return ((bool)(this["ExtractionAutoDDTToTGAConversion"]));
+            }
+            set {
+                this["ExtractionAutoDDTToTGAConversion"] = value;
+            }
+        }
     }
 }

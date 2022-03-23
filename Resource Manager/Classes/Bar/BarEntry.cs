@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Resource_Manager.Classes.Bar
@@ -88,6 +89,43 @@ namespace Resource_Manager.Classes.Bar
 
         private uint crc32 { get; set; }
 
+        public uint isCompressed { get; set; }
+
+
+
+        [JsonIgnore]
+        public string Extension
+        {
+            get
+            {
+                return Path.GetExtension(FileName).ToUpper() != "" ? Path.GetExtension(FileName).ToUpper() : "UNKNOWN";
+            }
+        }
+        [JsonIgnore]
+        private string FileName { get; set; }
+
+        public string FileNameWithRoot { get; set; }
+
+        
+        [JsonIgnore]
+        public long Offset { get; set; }
+
+        public int FileSize { get; set; }
+        [JsonIgnore]
+        public int FileSize2 { get; set; }
+        [JsonIgnore]
+        public int FileSize3 { get; set; }
+        [JsonIgnore]
+        public BarEntryLastWriteTime LastWriteTime { get; set; }
+        [JsonIgnore]
+        public DateTime lastModifiedDate
+        {
+            get
+            {
+                return new DateTime(LastWriteTime.Year, LastWriteTime.Month, LastWriteTime.Day, LastWriteTime.Hour, LastWriteTime.Minute, LastWriteTime.Second, LastWriteTime.Msecond, DateTimeKind.Utc);
+            }
+        }
+        [JsonIgnore]
         public uint CRC32
         {
             get
@@ -101,41 +139,7 @@ namespace Resource_Manager.Classes.Bar
             }
         }
 
-
-        public string Extension
-        {
-            get
-            {
-                return Path.GetExtension(FileName).ToUpper() != "" ? Path.GetExtension(FileName).ToUpper() : "UNKNOWN";
-            }
-        }
-
-        private string FileName { get; set; }
-
-        public string FileNameWithRoot { get; set; }
-
-        public uint isCompressed { get; set; }
-
-        public long Offset { get; set; }
-
-
-
-        public int FileSize { get; set; }
-
-        public int FileSize2 { get; set; }
-
-        public int FileSize3 { get; set; }
-
-        public BarEntryLastWriteTime LastWriteTime { get; set; }
-
-        public DateTime lastModifiedDate
-        {
-            get
-            {
-                return new DateTime(LastWriteTime.Year, LastWriteTime.Month, LastWriteTime.Day, LastWriteTime.Hour, LastWriteTime.Minute, LastWriteTime.Second, LastWriteTime.Msecond, DateTimeKind.Utc);
-            }
-        }
-
+        [JsonIgnore]
         public string fileFormat
         {
             get
@@ -143,7 +147,7 @@ namespace Resource_Manager.Classes.Bar
                 return (isCompressed != 0 ? "Compressed " : "") + Path.GetExtension(FileName).ToUpper();
             }
         }
-
+        [JsonIgnore]
         public string fileNameWithoutPath
         {
             get

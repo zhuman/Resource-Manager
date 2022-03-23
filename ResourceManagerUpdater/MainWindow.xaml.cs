@@ -39,16 +39,8 @@ namespace ResourceManagerUpdater
             }
         }
 
-        private string downloaded;
-        public string Downloaded
-        {
-            get { return downloaded; }
-            set
-            {
-                downloaded = value;
-                NotifyPropertyChanged();
-            }
-        }
+        public long DownloadedSize { get; set; }
+        public long UpdatesSize { get; set; }
 
         private string updateName;
         public string UpdateName
@@ -72,18 +64,58 @@ namespace ResourceManagerUpdater
             }
         }
 
+        private string availableVersion;
+        public string AvailableVersion
+        {
+            get { return availableVersion; }
+            set
+            {
+                availableVersion = value;
+                NotifyPropertyChanged();
+            }
+        }
+
         public class Update
         {
             public string name { get; set; }
             public string url { get; set; }
             public string md5 { get; set; }
+            public long size { get; set; }
             public string install_path { get; set; }
+
         }
+        public string CurrentVersion
+        {
+            get
+            {
+                return "0.4.5";
+            }
+        } 
+        public string AvailableVersionUrl
+        {
+            get
+            {
+                return "https://github.com/VladTheJunior/Resource-Manager";
+            }
+        } 
 
         public class Updates
         {
+            public string version { get; set; }
+            public string url { get; set; }
             public List<Update> files { get; set; } = new List<Update>();
         }
+
+        private void Hyperlink_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
+        {
+            var psi = new ProcessStartInfo
+            {
+                FileName = e.Uri.ToString(),
+                UseShellExecute = true
+            };
+            Process.Start(psi);
+        }
+
 
         public Updates ServerUpdates { get; set; } = new Updates();
         public Updates ClientUpdates { get; set; } = new Updates();
@@ -118,18 +150,18 @@ namespace ResourceManagerUpdater
                 var url = urls.Dequeue();
                 Directory.CreateDirectory(Path.GetDirectoryName(Path.Combine(Environment.CurrentDirectory, url.install_path)));
                 client.DownloadFileAsync(new Uri((url.url)), Path.Combine(Environment.CurrentDirectory, url.install_path));
-                UpdateName = "Downloading: " + url.name;
+                UpdateName = url.name;
+
+
                 return;
             }
 
-            ProgressText = "Download Complete";
-            UpdateName = "";
-            Downloaded = "";
             using (var batFile = new StreamWriter(File.Create("Update.bat")))
             {
                 string file = Path.GetFileName(Process.GetCurrentProcess().MainModule.FileName);
                 batFile.WriteLine("@ECHO OFF");
                 batFile.WriteLine("TIMEOUT /t 1 /nobreak > NUL");
+                batFile.WriteLine("TASKKILL /F /IM \"{0}\" > NUL", "Resource Manager.exe");
                 batFile.WriteLine("TASKKILL /F /IM \"{0}\" > NUL", file);
                 batFile.WriteLine("IF EXIST \"{0}\" MOVE \"{0}\" \"{1}\"", file + ".upd", file);
                 batFile.WriteLine("IF EXIST \"{0}\" MOVE \"{0}\" \"{1}\"", Path.GetFileNameWithoutExtension(file) + ".dll.upd", Path.GetFileNameWithoutExtension(file) + ".dll");
@@ -159,8 +191,10 @@ namespace ResourceManagerUpdater
 
         void client_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
         {
-            Progress = (double)e.BytesReceived / (double)e.TotalBytesToReceive;
-            Downloaded = "Downloaded: " + (e.BytesReceived / 1024).ToString("N0") + " KB from " + (e.TotalBytesToReceive / 1024).ToString("N0") + " KB";
+            
+            DownloadedSize += e.BytesReceived;
+            Progress = (double)DownloadedSize / (double)UpdatesSize;
+            ProgressText = "Downloading: " + FormatFileSize(DownloadedSize) + " of " + FormatFileSize(UpdatesSize);
         }
 
         async Task<string> HttpGetAsync(string URI)
@@ -202,26 +236,44 @@ namespace ResourceManagerUpdater
             DataContext = this;
         }
 
+        public static string FormatFileSize(long bytes)
+        {
+            var unit = 1024;
+            if (bytes < unit) { return $"{bytes} B"; }
 
+            var exp = (int)(Math.Log(bytes) / Math.Log(unit));
+            return $"{bytes / Math.Pow(unit, exp):F2} {("KMGTPE")[exp - 1]}B";
+        }
 
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            ProgressText = "Checking for updates...";
 
-            foreach (string path in Directory.GetFiles(Environment.CurrentDirectory, "*.*", SearchOption.AllDirectories))
-            {
-                if (!path.Contains(".git")
+            int index = 1;
+            var updateFiles = Directory.GetFiles(Environment.CurrentDirectory, "*.*", SearchOption.AllDirectories).Where(path => !path.Contains(".git")
                     && Path.GetFileName(path) != "Updates.json"
-                    && Path.GetFileName(path) != ".gitignore" && Path.GetFileName(Path.GetDirectoryName(path)) != "Output")
-                    ClientUpdates.files.Add(new Update { name = Path.GetFileName(path), install_path = path.Remove(0, Environment.CurrentDirectory.Length + 1), md5 = await CalculateMD5(path), url = new Uri(new Uri("https://raw.githubusercontent.com/VladTheJunior/ResourceManagerUpdates/master/"), path.Remove(0, Environment.CurrentDirectory.Length + 1)).ToString() });
+                    && Path.GetFileName(path) != ".gitignore" && Path.GetFileName(Path.GetDirectoryName(path)) != "Output");
+            foreach (string path in updateFiles)
+            {
+                Progress = (double)index / (double)updateFiles.Count();
+                ClientUpdates.files.Add(new Update { name = Path.GetFileName(path), size = new FileInfo(path).Length, install_path = path.Remove(0, Environment.CurrentDirectory.Length + 1), md5 = await CalculateMD5(path), url = new Uri(new Uri("https://raw.githubusercontent.com/VladTheJunior/ResourceManagerUpdates/master/"), path.Remove(0, Environment.CurrentDirectory.Length + 1)).ToString() });
+                ProgressText = $"Checking: file {index} of {updateFiles.Count()}";
+                UpdateName = Path.GetFileName(path);
+                index++;
             }
+
+            ClientUpdates.version = CurrentVersion;
+            ClientUpdates.url = AvailableVersionUrl;
             await File.WriteAllTextAsync("Updates.json", JsonConvert.SerializeObject(ClientUpdates));
 
 
             ServerUpdates = await CheckUpdates();
+            AvailableVersion = ServerUpdates.version;
             if (ServerUpdates.files.Count > 0)
             {
-
+                foreach (var process in Process.GetProcessesByName("Resource Manager"))
+                {
+                    process.Kill();
+                }
                 var differences = ServerUpdates.files.Where(s => !ClientUpdates.files.Any(c => c.install_path == s.install_path && c.md5 == s.md5));
                 foreach (Update f in differences)
                 {
@@ -230,19 +282,10 @@ namespace ResourceManagerUpdater
                     NewUpdates.Enqueue(f);
                 }
             }
-
-            if (!NewUpdates.Any())
-                ProgressText = "No new updates.";
-            else
-            {
-                ProgressText = "Getting updates...";
-            }
+            Progress = 0;
+            DownloadedSize = 0;
+            UpdatesSize = NewUpdates.Sum(x => x.size);
             DownloadFile(NewUpdates);
-        }
-
-        private void Window_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            DragMove();
         }
     }
 }

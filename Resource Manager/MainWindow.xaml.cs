@@ -3,6 +3,7 @@ using ICSharpCode.AvalonEdit.Folding;
 using ICSharpCode.AvalonEdit.Highlighting;
 using ICSharpCode.AvalonEdit.Sample;
 using ICSharpCode.AvalonEdit.Search;
+using Microsoft.Win32;
 using NAudio.Wave;
 using Resource_Manager.Classes.Alz4;
 using Resource_Manager.Classes.Bar;
@@ -20,6 +21,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -153,8 +155,8 @@ namespace Resource_Manager
                 await file.readFile(entry);
                 if (outputDevice != null)
                 {
-                outputDevice.Dispose();
-                outputDevice = null;
+                    outputDevice.Dispose();
+                    outputDevice = null;
                 }
                 if (mp3File != null)
                 {
@@ -192,10 +194,10 @@ namespace Resource_Manager
                     }
                 }
 
-                if (entry.Extension == ".WAV" )
+                if (entry.Extension == ".WAV")
                 {
-                    
-                   using (outputDevice = new WaveOutEvent())
+
+                    using (outputDevice = new WaveOutEvent())
                     using (waveFile = new WaveFileReader(file.audio))
                     {
                         outputDevice.Init(waveFile);
@@ -303,15 +305,15 @@ namespace Resource_Manager
                 NotifyPropertyChanged("recentFiles");
                 NotifyPropertyChanged("file");
                 if (file.barFile.barFileHeader.Version > 5)
-                {           
+                {
                     gvclastModifiedDate.Width = 0;
                     gvcFileName.Width = 440;
 
                 }
                 else
                 {
-                   gvclastModifiedDate.Width = 190;
-                   gvcFileName.Width = 250;
+                    gvclastModifiedDate.Width = 190;
+                    gvcFileName.Width = 250;
                 }
             }
             catch (Exception e)
@@ -386,7 +388,7 @@ namespace Resource_Manager
             }
             if (header.Tag.ToString() == "FileNameWithRoot")
             {
-                
+
 
                 if (file.barFile.barFileHeader.Version > 5)
                 {
@@ -412,7 +414,7 @@ namespace Resource_Manager
                 {
                     e.Handled = true;
                     header.Column.Width = 0;
-                    
+
                 }
                 else
                 {
@@ -430,24 +432,31 @@ namespace Resource_Manager
         private async void extractMenuItem(object sender, RoutedEventArgs e)
         {
             if (file == null) return;
-             List<BarEntry> entries;
-             if ((sender as MenuItem).Tag.ToString() == "Selected")
-                 entries = files.SelectedItems.Cast<BarEntry>().ToList();
-             else
-                 entries = file.SourceCollection.Cast<BarEntry>().ToList();
-            /*
-              List<BarEntry> entries = new List<BarEntry>();
-               List<string> icons = new List<string>(await File.ReadAllLinesAsync(@"C:\Users\vladt\Desktop\icons.txt"));
-               icons.ForEach(x =>
-               {
-                   var a = file.barFile.BarFileEntrys.FirstOrDefault(a => a.FileNameWithRoot.ToLower() == "data\\wpfg\\" + x.Replace('/', '\\').ToLower());
-                   if (a != null)
-                       entries.Add(a);
-                   else
-                       Debug.WriteLine(x);
-                   }
-               );
-                */
+            mainMenu.IsEnabled = false;
+            tbExtract.Text = "Extracting";
+            SpinnerExtract.Visibility = Visibility.Visible;
+            List<BarEntry> entries;
+            if ((sender as MenuItem).Tag.ToString() == "Selected")
+            {
+                entries = files.SelectedItems.Cast<BarEntry>().ToList();
+            }
+            else if ((sender as MenuItem).Tag.ToString() == "List")
+            {
+                entries = new List<BarEntry>();
+                OpenFileDialog openFileDialog = new OpenFileDialog();
+                openFileDialog.Filter = "Text files (*.txt)|*.txt";
+                if (openFileDialog.ShowDialog() == true)
+                {
+                    List<string> icons = new List<string>(await File.ReadAllLinesAsync(openFileDialog.FileName));
+                    entries = file.barFile.BarFileEntrys.Where(x =>
+                icons.Any(y => x.FileNameWithRoot.ToLower().EndsWith(y.Replace('/', '\\').ToLower()))).ToList();
+
+                }
+            }
+            else
+            {
+                entries = file.SourceCollection.Cast<BarEntry>().ToList();
+            }
 
             if (entries.Count != 0)
             {
@@ -455,43 +464,40 @@ namespace Resource_Manager
 
 
                 ExtractDialog ExtractDialog = new ExtractDialog(file.barFilePath);
-                if (ExtractDialog.ShowDialog() != true)
-                    return;
-
-                RootPath = ExtractDialog.Path;
-
-
-                mainMenu.IsEnabled = false;
-                tbExtract.Text = "Extracting";
-                SpinnerExtract.Visibility = Visibility.Visible;
-                bPause.IsEnabled = true;
-                bStop.IsEnabled = true;
-                bRun.IsEnabled = false;
-                bool decompress = ExtractDialog.AutoDecompress;
-
-                file.extractingState = 0;
-                CancelTokenSource = new CancellationTokenSource();
-                Token = CancelTokenSource.Token;
-                try
+                if (ExtractDialog.ShowDialog() == true)
                 {
 
-                    await Task.Run(async () =>
+                    RootPath = ExtractDialog.Path;
+                    bPause.IsEnabled = true;
+                    bStop.IsEnabled = true;
+                    bRun.IsEnabled = false;
+                    bool decompress = ExtractDialog.AutoDecompress;
+
+                    file.extractingState = 0;
+                    CancelTokenSource = new CancellationTokenSource();
+                    Token = CancelTokenSource.Token;
+                    try
                     {
-                        await file.saveFiles(entries, RootPath, decompress, Token, ExtractDialog.AutoDDTToPNGConversion, ExtractDialog.AutoDDTToTGAConversion, ExtractDialog.AutoXMBConversion, ExtractDialog.OneFolder, ExtractDialog.SavePNGasBMP);
-                    });
 
+                        await Task.Run(async () =>
+                        {
+                            await file.saveFiles(entries, RootPath, decompress, Token, ExtractDialog.AutoDDTToPNGConversion, ExtractDialog.AutoDDTToTGAConversion, ExtractDialog.AutoXMBConversion, ExtractDialog.OneFolder, ExtractDialog.SavePNGasBMP);
+                        });
+
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                    bPause.IsEnabled = false;
+                    bStop.IsEnabled = false;
+                    bRun.IsEnabled = false;
                 }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-                bPause.IsEnabled = false;
-                bStop.IsEnabled = false;
-                bRun.IsEnabled = false;
-                tbExtract.Text = "Extract";
-                SpinnerExtract.Visibility = Visibility.Collapsed;
-                mainMenu.IsEnabled = true;
+
             }
+            tbExtract.Text = "Extract";
+            SpinnerExtract.Visibility = Visibility.Collapsed;
+            mainMenu.IsEnabled = true;
         }
 
         private void bPause_Click(object sender, RoutedEventArgs e)
@@ -585,7 +591,7 @@ namespace Resource_Manager
 
                     if (file.barFile.barFileHeader.Version > 5)
                     {
-           
+
                         gvclastModifiedDate.Width = 0;
 
                     }
@@ -642,29 +648,29 @@ namespace Resource_Manager
 
 
 
-            
 
-                if (operationType == "totga")
+
+            if (operationType == "totga")
+            {
+                openFileDialog.Filter = "Age of Empires 3 ddt files (*.ddt)|*.ddt";
+                if (openFileDialog.ShowDialog() == true)
                 {
-                    openFileDialog.Filter = "Age of Empires 3 ddt files (*.ddt)|*.ddt";
-                    if (openFileDialog.ShowDialog() == true)
+                    Settings.Default.lastConvertedPath = Path.GetDirectoryName(openFileDialog.FileName);
+                    Settings.Default.Save();
+                    foreach (var file in openFileDialog.FileNames)
                     {
-                        Settings.Default.lastConvertedPath = Path.GetDirectoryName(openFileDialog.FileName);
-                        Settings.Default.Save();
-                        foreach (var file in openFileDialog.FileNames)
+                        try
                         {
-                            try
-                            {
-                                await DdtFileUtils.Ddt2TgaAsync(file);
-                            }
-                            catch (Exception ex)
-                            {
-                                MessageBox.Show(ex.Message, "Conversion error - " + Path.GetFileName(file), MessageBoxButton.OK, MessageBoxImage.Error);
-                            }
+                            await DdtFileUtils.Ddt2TgaAsync(file);
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show(ex.Message, "Conversion error - " + Path.GetFileName(file), MessageBoxButton.OK, MessageBoxImage.Error);
                         }
                     }
                 }
-                if (operationType == "topng")
+            }
+            if (operationType == "topng")
             {
                 openFileDialog.Filter = "Age of Empires 3 ddt files (*.ddt)|*.ddt";
                 if (openFileDialog.ShowDialog() == true)
@@ -842,7 +848,7 @@ namespace Resource_Manager
 
         private void StatusBar_MouseDown(object sender, MouseButtonEventArgs e)
         {
-           
+
         }
 
         private void MenuItem_Click_2(object sender, RoutedEventArgs e)
@@ -868,7 +874,27 @@ namespace Resource_Manager
             {
                 openFile(args[1]);
             }
-            
+
+        }
+
+        private void MenuItem_Click_6(object sender, RoutedEventArgs e)
+        {
+            Clipboard.SetText((files.SelectedItem as BarEntry).FileNameWithRoot);
+        }
+
+        private async void MenuItem_Click_8(object sender, RoutedEventArgs e)
+        {
+            if (file == null) return;
+            var options = new JsonSerializerOptions { WriteIndented = true };
+            var json = JsonSerializer.Serialize(file.barFile.BarFileEntrys, options);
+
+            SaveFileDialog saveDialog = new SaveFileDialog();
+            saveDialog.FileName = Path.GetFileNameWithoutExtension(file.barFilePath) + " - entries details.json";
+            saveDialog.Filter = "JSON files (*.json)|*.json";
+            if (saveDialog.ShowDialog() == true)
+            {
+                await File.WriteAllTextAsync(saveDialog.FileName, json);
+            }
         }
     }
 

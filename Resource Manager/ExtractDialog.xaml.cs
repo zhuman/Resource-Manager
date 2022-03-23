@@ -108,7 +108,15 @@ namespace Resource_Manager
         {         
             InitializeComponent();
             ExportPath.Text = Directory.Exists(Settings.Default.lastExportedPath) ? Settings.Default.lastExportedPath : DefaultRootPath;
-            DataContext = this;
+
+            AutoDecompress = Settings.Default.ExtractionAutoDecompress ? Settings.Default.ExtractionAutoDecompress : true;
+            OneFolder = Settings.Default.ExtractionOneFolder ? Settings.Default.ExtractionOneFolder : false;
+            SavePNGasBMP = Settings.Default.ExtractionSavePNGasBMP ? Settings.Default.ExtractionSavePNGasBMP : false;
+            AutoXMBConversion = Settings.Default.ExtractionAutoXMBConversion ? Settings.Default.ExtractionAutoXMBConversion : false;
+            AutoDDTToPNGConversion = Settings.Default.ExtractionAutoDDTToPNGConversion ? Settings.Default.ExtractionAutoDDTToPNGConversion : false;
+            AutoDDTToTGAConversion = Settings.Default.ExtractionAutoDDTToTGAConversion ? Settings.Default.ExtractionAutoDDTToTGAConversion : true;
+
+        DataContext = this;
         }
 
         private void NavigateButton_Click(object sender, RoutedEventArgs e)
@@ -131,6 +139,14 @@ namespace Resource_Manager
             if (Directory.Exists(ExportPath.Text))
             {
                 Path = ExportPath.Text;
+
+                Settings.Default.ExtractionAutoDecompress = AutoDecompress;
+                Settings.Default.ExtractionOneFolder = OneFolder;
+                Settings.Default.ExtractionSavePNGasBMP = SavePNGasBMP;
+                Settings.Default.ExtractionAutoXMBConversion = AutoXMBConversion;
+                Settings.Default.ExtractionAutoDDTToPNGConversion = AutoDDTToPNGConversion;
+                Settings.Default.ExtractionAutoDDTToTGAConversion = AutoDDTToTGAConversion;
+                Settings.Default.Save();
                 DialogResult = true;
             }
             else
