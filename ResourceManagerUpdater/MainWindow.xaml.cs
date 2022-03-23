@@ -247,7 +247,7 @@ namespace ResourceManagerUpdater
 
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
-
+            AvailableVersion = "checking...";
             int index = 1;
             var updateFiles = Directory.GetFiles(Environment.CurrentDirectory, "*.*", SearchOption.AllDirectories).Where(path => !path.Contains(".git")
                     && Path.GetFileName(path) != "Updates.json"
@@ -267,9 +267,10 @@ namespace ResourceManagerUpdater
 
 
             ServerUpdates = await CheckUpdates();
-            AvailableVersion = ServerUpdates.version;
+            
             if (ServerUpdates.files.Count > 0)
             {
+                AvailableVersion = ServerUpdates.version;
                 foreach (var process in Process.GetProcessesByName("Resource Manager"))
                 {
                     process.Kill();
@@ -281,6 +282,10 @@ namespace ResourceManagerUpdater
                         f.install_path += ".upd";
                     NewUpdates.Enqueue(f);
                 }
+            }
+            else
+            {
+                AvailableVersion = "up-to-dated";
             }
             Progress = 0;
             DownloadedSize = 0;
