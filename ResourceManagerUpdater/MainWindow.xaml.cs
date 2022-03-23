@@ -269,17 +269,20 @@ namespace ResourceManagerUpdater
             
             if (ServerUpdates.files.Count > 0)
             {
-                AvailableVersion = ServerUpdates.version;
-                foreach (var process in Process.GetProcessesByName("Resource Manager"))
-                {
-                    process.Kill();
-                }
                 var differences = ServerUpdates.files.Where(s => !ClientUpdates.files.Any(c => c.install_path == s.install_path && c.md5 == s.md5));
                 foreach (Update f in differences)
                 {
                     if (f.name == "ResourceManagerUpdater.exe" || f.name == "ResourceManagerUpdater.dll")
                         f.install_path += ".upd";
                     NewUpdates.Enqueue(f);
+                }
+            }
+            if (NewUpdates.Count > 0)
+            {
+                AvailableVersion = ServerUpdates.version;
+                foreach (var process in Process.GetProcessesByName("Resource Manager"))
+                {
+                    process.Kill();
                 }
             }
             else
