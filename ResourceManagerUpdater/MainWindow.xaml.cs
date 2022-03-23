@@ -39,8 +39,27 @@ namespace ResourceManagerUpdater
             }
         }
 
-        public long DownloadedSize { get; set; }
-        public long UpdatesSize { get; set; }
+        private long downloadedSize;
+        public long DownloadedSize
+        {
+            get { return downloadedSize; }
+            set
+            {
+                downloadedSize = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private long updatesSize;
+        public long UpdatesSize
+        {
+            get { return updatesSize; }
+            set
+            {
+                updatesSize = value;
+                NotifyPropertyChanged();
+            }
+        }
 
         private string updateName;
         public string UpdateName
@@ -143,6 +162,7 @@ namespace ResourceManagerUpdater
         {
             if (urls.Any())
             {
+                previousDownloaded = 0;
                 WebClient client = new WebClient();
                 client.DownloadProgressChanged += client_DownloadProgressChanged;
                 client.DownloadFileCompleted += client_DownloadFileCompleted;
@@ -188,12 +208,15 @@ namespace ResourceManagerUpdater
             DownloadFile(NewUpdates);
         }
 
+        private long previousDownloaded = 0;
+
         void client_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
         {
             
-            DownloadedSize += e.BytesReceived;
+            DownloadedSize += e.BytesReceived - previousDownloaded;
             Progress = (double)DownloadedSize / (double)UpdatesSize;
             ProgressText = "Downloading: " + FormatFileSize(DownloadedSize) + " of " + FormatFileSize(UpdatesSize);
+            previousDownloaded = e.BytesReceived;
         }
 
         async Task<string> HttpGetAsync(string URI)
