@@ -2,6 +2,7 @@
 [![GitHub stars](https://img.shields.io/github/stars/VladTheJunior/Resource-Manager)](https://github.com/VladTheJunior/Resource-Manager/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/VladTheJunior/Resource-Manager)](https://github.com/VladTheJunior/Resource-Manager/network)
 [![GitHub issues](https://img.shields.io/github/issues/VladTheJunior/Resource-Manager)](https://github.com/VladTheJunior/Resource-Manager/issues)
+[![.NET6](https://github.com/KevinW1998/Resource-Manager/actions/workflows/dotnet6.yml/badge.svg?branch=master&event=release)](https://github.com/KevinW1998/Resource-Manager/actions/workflows/dotnet6.yml)
 [![GitHub license](https://img.shields.io/github/license/VladTheJunior/Resource-Manager)](https://github.com/VladTheJunior/Resource-Manager/blob/master/LICENSE)
 <!-- PROJECT LOGO -->
 <br />
