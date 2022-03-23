@@ -18,7 +18,7 @@
 **Developer:** VladTheJunior and Kevsoft<br />
 **Current version:** 0.4.5<br />
 
-[Download Portable](https://github.com/KevinW1998/Resource-Manager/releases/latest/ResourceManager.zip)<br />
+[Download Portable](https://github.com/VladTheJunior/Resource-Manager/releases/latest/download/ResourceManager.zip)<br />
 [Download Installer from Google Drive](https://drive.google.com/file/d/1GjVmzKMvATIHdrxo3i4OIvt4-LMNoOtM/view?usp=sharing)<br />
 
 *Note: Portable version may require .NET6: https://dotnet.microsoft.com/en-us/download/dotnet/6.0
