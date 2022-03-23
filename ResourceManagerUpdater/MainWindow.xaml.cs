@@ -161,7 +161,6 @@ namespace ResourceManagerUpdater
                 string file = Path.GetFileName(Process.GetCurrentProcess().MainModule.FileName);
                 batFile.WriteLine("@ECHO OFF");
                 batFile.WriteLine("TIMEOUT /t 1 /nobreak > NUL");
-                batFile.WriteLine("TASKKILL /F /IM \"{0}\" > NUL", "Resource Manager.exe");
                 batFile.WriteLine("TASKKILL /F /IM \"{0}\" > NUL", file);
                 batFile.WriteLine("IF EXIST \"{0}\" MOVE \"{0}\" \"{1}\"", file + ".upd", file);
                 batFile.WriteLine("IF EXIST \"{0}\" MOVE \"{0}\" \"{1}\"", Path.GetFileNameWithoutExtension(file) + ".dll.upd", Path.GetFileNameWithoutExtension(file) + ".dll");
