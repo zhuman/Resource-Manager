@@ -5,6 +5,7 @@ using ICSharpCode.AvalonEdit.Sample;
 using ICSharpCode.AvalonEdit.Search;
 using Microsoft.Win32;
 using NAudio.Wave;
+using Newtonsoft.Json;
 using Resource_Manager.Classes.Alz4;
 using Resource_Manager.Classes.Bar;
 using Resource_Manager.Classes.Commands;
@@ -31,6 +32,8 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Xml;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 using MessageBox = System.Windows.MessageBox;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 
@@ -55,7 +58,7 @@ namespace Resource_Manager
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public bool DoCRC32 = false;
+        //public bool DoCRC32 = false;
 
         public ObservableCollection<RecentFile> recentFiles { get; set; } = new ObservableCollection<RecentFile>();
 
@@ -113,13 +116,12 @@ namespace Resource_Manager
             InitializeComponent();
             SearchPanel.Install(XMLViewer);
             DataContext = this;
-
             tempColumn = (files.View as GridView).Columns[3];
-            if (DoCRC32 == false)
+            /*if (DoCRC32 == false)
             {
                 (files.View as GridView).Columns.RemoveAt(3);
-            }
-            cdGrid.Width = new GridLength(675, GridUnitType.Pixel);
+            }*/
+            //cdGrid.Width = new GridLength(675, GridUnitType.Pixel);
             files.AddHandler(Thumb.DragDeltaEvent, new DragDeltaEventHandler(Thumb_DragDelta), true);
 
             for (int i = 0; i < Math.Min(10, Settings.Default.RecentFiles.Count); i++)
@@ -293,7 +295,7 @@ namespace Resource_Manager
                 file = null;
                 NotifyPropertyChanged("recentFiles");
                 NotifyPropertyChanged("file");
-                file = await BarViewModel.Load(filePath, DoCRC32);
+                file = await BarViewModel.Load(filePath, true/*DoCRC32*/);
                 if (Settings.Default.RecentFiles.Contains(filePath))
                 {
                     Settings.Default.RecentFiles.Remove(filePath);
@@ -481,7 +483,7 @@ namespace Resource_Manager
 
                         await Task.Run(async () =>
                         {
-                            await file.saveFiles(entries, RootPath, decompress, Token, ExtractDialog.AutoDDTToPNGConversion, ExtractDialog.AutoDDTToTGAConversion, ExtractDialog.AutoXMBConversion, ExtractDialog.OneFolder, ExtractDialog.SavePNGasBMP);
+                            await file.saveFiles(entries, RootPath, decompress, Token, ExtractDialog.AutoDDTToPNGConversion, ExtractDialog.AutoDDTToTGAConversion, ExtractDialog.AutoXMBConversion, ExtractDialog.OneFolder, ExtractDialog.SavePNGasBMP, ExtractDialog.AutoJSONConversion, ExtractDialog.OverlayColor);
                         });
 
                     }
@@ -730,6 +732,156 @@ namespace Resource_Manager
                     }
                 }
             }
+            if (operationType == "jsontoxml")
+            {
+                openFileDialog.Filter = "JSON files (*.json)|*.json";
+
+                if (openFileDialog.ShowDialog() == true)
+                {
+                    Settings.Default.lastConvertedPath = Path.GetDirectoryName(openFileDialog.FileName);
+                    Settings.Default.Save();
+                    foreach (var file in openFileDialog.FileNames)
+                    {
+                        try
+                        {
+                            var data = await File.ReadAllBytesAsync(file);
+
+
+                            if (Alz4Utils.IsAlz4File(data))
+                            {
+                                data = await Alz4Utils.ExtractAlz4BytesAsync(data);
+                            }
+                            else
+                            {
+                                if (L33TZipUtils.IsL33TZipFile(data))
+                                    data = await L33TZipUtils.ExtractL33TZippedBytesAsync(data);
+                            }
+                            string json = await File.ReadAllTextAsync(file);
+                            var xml = JsonConvert.DeserializeXmlNode(json);
+                  
+                            var newName = Path.ChangeExtension(file, "");
+
+                                
+
+                            xml.Save(newName);
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show(ex.Message, "Conversion error - " + Path.GetFileName(file), MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
+                    }
+                }
+            }
+            if (operationType == "xmbtojson")
+            {
+                openFileDialog.Filter = "Age of Empires 3 xmb files (*.xmb)|*.xmb";
+
+                if (openFileDialog.ShowDialog() == true)
+                {
+                    Settings.Default.lastConvertedPath = Path.GetDirectoryName(openFileDialog.FileName);
+                    Settings.Default.Save();
+                    foreach (var file in openFileDialog.FileNames)
+                    {
+                        try
+                        {
+                            var data = await File.ReadAllBytesAsync(file);
+
+
+                            if (Alz4Utils.IsAlz4File(data))
+                            {
+                                data = await Alz4Utils.ExtractAlz4BytesAsync(data);
+                            }
+                            else
+                            {
+                                if (L33TZipUtils.IsL33TZipFile(data))
+                                    data = await L33TZipUtils.ExtractL33TZippedBytesAsync(data);
+                            }
+
+
+                            using MemoryStream stream = new MemoryStream(data);
+
+                            XMBFile xmb = await XMBFile.LoadXMBFile(stream);
+                            string json = JsonConvert.SerializeXmlNode(xmb.file);
+                            await File.WriteAllTextAsync(Path.ChangeExtension(file, "json"), json);
+
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show(ex.Message, "Conversion error - " + Path.GetFileName(file), MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
+                    }
+                }
+            }
+            if (operationType == "xmltojson")
+            {
+                openFileDialog.Filter = "Age of Empires 3 xml files (*.*)|*.*";
+
+                if (openFileDialog.ShowDialog() == true)
+                {
+                    Settings.Default.lastConvertedPath = Path.GetDirectoryName(openFileDialog.FileName);
+                    Settings.Default.Save();
+                    foreach (var file in openFileDialog.FileNames)
+                    {
+                        try
+                        {
+                            XmlDocument xml = new XmlDocument();
+                            xml.Load(file);
+                            string json = JsonConvert.SerializeXmlNode(xml);
+                            await File.WriteAllTextAsync(Path.ChangeExtension(file, "json"), json);
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show(ex.Message, "Conversion error - " + Path.GetFileName(file), MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
+                    }
+                }
+            }
+            if (operationType == "jsontoxmblegacy")
+            {
+                openFileDialog.Filter = "JSON files (*.json)|*.json";
+
+                if (openFileDialog.ShowDialog() == true)
+                {
+                    Settings.Default.lastConvertedPath = Path.GetDirectoryName(openFileDialog.FileName);
+                    Settings.Default.Save();
+                    foreach (var file in openFileDialog.FileNames)
+                    {
+                        try
+                        {
+                            string json = await File.ReadAllTextAsync(file);
+                            var xml = JsonConvert.DeserializeXmlNode(json);
+                            await XMBFile.CreateXMBFileL33T(xml, file);
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show(ex.Message, "Conversion error - " + Path.GetFileName(file), MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
+                    }
+                }
+            }
+            if (operationType == "jsontoxmbde")
+            {
+                openFileDialog.Filter = "JSON files (*.json)|*.json";
+
+                if (openFileDialog.ShowDialog() == true)
+                {
+                    Settings.Default.lastConvertedPath = Path.GetDirectoryName(openFileDialog.FileName);
+                    Settings.Default.Save();
+                    foreach (var file in openFileDialog.FileNames)
+                    {
+                        try
+                        {
+                            string json = await File.ReadAllTextAsync(file);
+                            var xml = JsonConvert.DeserializeXmlNode(json);
+                            await XMBFile.CreateXMBFileALZ4(xml, file);
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show(ex.Message, "Conversion error - " + Path.GetFileName(file), MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
+                    }
+                }
+            }
             if (operationType == "toxmbde")
             {
                 openFileDialog.Filter = "Age of Empires 3 xml files (*.*)|*.*";
@@ -782,7 +934,7 @@ namespace Resource_Manager
         GridViewColumn tempColumn;
         private void MenuItem_Checked_2(object sender, RoutedEventArgs e)
         {
-            (files.View as GridView).Columns.Insert(3, tempColumn);
+           /* (files.View as GridView).Columns.Insert(3, tempColumn);
             tempColumn.Width = 100;
             cdGrid.Width = new GridLength(775, GridUnitType.Pixel);
             if (file != null)
@@ -793,15 +945,15 @@ namespace Resource_Manager
                     file.IsCRC32Checked = true;
                 }
             }
-            DoCRC32 = true;
+            DoCRC32 = true;*/
         }
 
         private void MenuItem_Unchecked_2(object sender, RoutedEventArgs e)
         {
-            tempColumn = (files.View as GridView).Columns[3];
+           /* tempColumn = (files.View as GridView).Columns[3];
             (files.View as GridView).Columns.RemoveAt(3);
             cdGrid.Width = new GridLength(675, GridUnitType.Pixel);
-            DoCRC32 = false;
+            DoCRC32 = false;*/
         }
 
         private void MenuItem_Click_5(object sender, RoutedEventArgs e)
@@ -867,9 +1019,9 @@ namespace Resource_Manager
             WindowState = WindowState.Minimized;
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            var args = Environment.GetCommandLineArgs();
+                var args = Environment.GetCommandLineArgs();
             if (args.Length > 1 && Path.GetExtension(args[1]).ToUpper() == ".BAR")
             {
                 openFile(args[1]);

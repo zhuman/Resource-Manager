@@ -1,4 +1,5 @@
-﻿using Resource_Manager.Classes.Alz4;
+﻿
+using Resource_Manager.Classes.Alz4;
 using System;
 using System.ComponentModel;
 using System.IO;
@@ -88,7 +89,7 @@ namespace Resource_Manager.Classes.Bar
         }
 
         private uint crc32 { get; set; }
-
+        [JsonPropertyName("compression")]
         public uint isCompressed { get; set; }
 
 
@@ -103,15 +104,15 @@ namespace Resource_Manager.Classes.Bar
         }
         [JsonIgnore]
         private string FileName { get; set; }
-
+        [JsonPropertyName("file")]
         public string FileNameWithRoot { get; set; }
 
         
         [JsonIgnore]
         public long Offset { get; set; }
-
-        public int FileSize { get; set; }
         [JsonIgnore]
+        public int FileSize { get; set; }
+        [JsonPropertyName("size")]
         public int FileSize2 { get; set; }
         [JsonIgnore]
         public int FileSize3 { get; set; }
@@ -125,6 +126,15 @@ namespace Resource_Manager.Classes.Bar
                 return new DateTime(LastWriteTime.Year, LastWriteTime.Month, LastWriteTime.Day, LastWriteTime.Hour, LastWriteTime.Minute, LastWriteTime.Second, LastWriteTime.Msecond, DateTimeKind.Utc);
             }
         }
+        [JsonPropertyName("crc32")]
+        public string formattedCRC32
+        {
+            get
+            {
+                return crc32.ToString("X8");
+            }
+        }
+
         [JsonIgnore]
         public uint CRC32
         {

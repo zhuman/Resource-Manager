@@ -1,4 +1,5 @@
-﻿using Pfim;
+﻿using Newtonsoft.Json;
+using Pfim;
 using Resource_Manager.Classes.Alz4;
 using Resource_Manager.Classes.Bar;
 using Resource_Manager.Classes.Ddt;
@@ -8,6 +9,9 @@ using Resource_Manager.Classes.Xmb;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -17,7 +21,10 @@ using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Xml;
+using Color = System.Drawing.Color;
 using ImageFormat = Pfim.ImageFormat;
+using PixelFormat = System.Drawing.Imaging.PixelFormat;
 
 namespace Archive_Unpacker.Classes.BarViewModel
 {
@@ -161,7 +168,7 @@ namespace Archive_Unpacker.Classes.BarViewModel
 
 
 
-        public async Task saveFiles(List<BarEntry> files, string savePath, bool Decompress, CancellationToken token, bool convertDDTToPNG, bool convertDDTToTGA, bool convertXMB, bool OneFolder, bool SavePNGasBMP)
+        public async Task saveFiles(List<BarEntry> files, string savePath, bool Decompress, CancellationToken token, bool convertDDTToPNG, bool convertDDTToTGA, bool convertXMB, bool OneFolder, bool SavePNGasBMP, bool AutoJSONConversion, Color OverlayColor)
         {
             ResetProgress();
             if (files.Count == 0) return;
@@ -226,11 +233,46 @@ namespace Archive_Unpacker.Classes.BarViewModel
                 {
 
                     using var memory = new MemoryStream(data);
-                    System.Drawing.Image imgFile = System.Drawing.Image.FromStream(memory);
+                    Bitmap img = new Bitmap(memory);
 
 
+                    PixelFormat fmt1 = img.PixelFormat;
+                    byte bpp1 = 4;
 
-                    imgFile.Save(Path.ChangeExtension(ExtractPath, "bmp"), System.Drawing.Imaging.ImageFormat.Bmp);
+                    Rectangle rect = new Rectangle(Point.Empty, new Size(img.Width, img.Height));
+                    BitmapData bmpData = img.LockBits(rect, ImageLockMode.ReadWrite, fmt1);
+
+                    int size1 = bmpData.Stride * bmpData.Height;
+                    byte[] pixels = new byte[size1];
+                    Marshal.Copy(bmpData.Scan0, pixels, 0, size1);
+
+                    for (int y = 0; y < img.Height; y++)
+                    {
+                        for (int x = 0; x < img.Width; x++)
+                        {
+                            int index = y * bmpData.Stride + x * bpp1;
+                            var alpha = pixels[index + 3];
+                            if (alpha < 255)
+                            {
+                                
+                                pixels[index] = (byte)(pixels[index]* OverlayColor.B / 255);  //b
+                                pixels[index + 1] = (byte)(pixels[index + 1] * OverlayColor.G / 255); //g
+                                pixels[index + 2] = (byte)(pixels[index + 2] * OverlayColor.R / 255); //r
+                                pixels[index + 3] = 255; 
+                            }
+
+                        }
+                    }
+
+                    Marshal.Copy(pixels, 0, bmpData.Scan0, pixels.Length);
+                    img.UnlockBits(bmpData);
+                    using (Graphics g = Graphics.FromImage(img))
+                    {
+                        g.DrawImage(new Bitmap(memory), Point.Empty);
+                        
+                    }
+                    img.Save(ExtractPath, System.Drawing.Imaging.ImageFormat.Png);
+                    CurrentProgress += (double)file.FileSize2 / filesSize;
                     continue;
 
                 }
@@ -258,6 +300,47 @@ namespace Archive_Unpacker.Classes.BarViewModel
 
                     xmb.file.Save(Path.ChangeExtension(ExtractPath, ""));
                 }
+
+                // Additionaly convert xmb -> json
+                if (file.Extension == ".XMB" && AutoJSONConversion)
+                {
+                    if (Alz4Utils.IsAlz4File(data))
+                    {
+                        data = await Alz4Utils.ExtractAlz4BytesAsync(data);
+                    }
+                    else
+                    {
+                        if (L33TZipUtils.IsL33TZipFile(data))
+                            data = await L33TZipUtils.ExtractL33TZippedBytesAsync(data);
+                    }
+
+                    using MemoryStream stream = new MemoryStream(data);
+                    XMBFile xmb = await XMBFile.LoadXMBFile(stream);
+                    string json = JsonConvert.SerializeXmlNode(xmb.file);
+                    await File.WriteAllTextAsync(Path.ChangeExtension(ExtractPath, "json"), json);
+                }
+
+                // Additionaly convert xml -> json
+                if (file.Extension == ".XML" && AutoJSONConversion)
+                {
+                    if (Alz4Utils.IsAlz4File(data))
+                    {
+                        data = await Alz4Utils.ExtractAlz4BytesAsync(data);
+                    }
+                    else
+                    {
+                        if (L33TZipUtils.IsL33TZipFile(data))
+                            data = await L33TZipUtils.ExtractL33TZippedBytesAsync(data);
+                    }
+
+                    using MemoryStream stream = new MemoryStream(data);
+                    XmlDocument xml = new XmlDocument();
+                    xml.Load(stream);
+                    string json = JsonConvert.SerializeXmlNode(xml);
+                    await File.WriteAllTextAsync(Path.ChangeExtension(ExtractPath, "json"), json);
+                }
+
+
 
 
                 // Additionaly convert ddt to png

@@ -143,5 +143,29 @@ namespace Resource_Manager {
                 this["ExtractionAutoDDTToTGAConversion"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ExtractionAutoJSONConversion {
+            get {
+                return ((bool)(this["ExtractionAutoJSONConversion"]));
+            }
+            set {
+                this["ExtractionAutoJSONConversion"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("White")]
+        public global::System.Drawing.Color ExtractionOverlayColor {
+            get {
+                return ((global::System.Drawing.Color)(this["ExtractionOverlayColor"]));
+            }
+            set {
+                this["ExtractionOverlayColor"] = value;
+            }
+        }
     }
 }

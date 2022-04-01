@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Resource_Manager"
+        xmlns:colorpicker="clr-namespace:ColorPicker;assembly=ColorPicker"
         mc:Ignorable="d"
         SizeToContent="Height"
         WindowStartupLocation="CenterScreen"
@@ -45,13 +46,11 @@
                 <TextBlock Visibility="{Binding ElementName=cbDecompress, Path=IsChecked, Converter={StaticResource VisibilityConverter}}" Grid.ColumnSpan="3" FontWeight="Normal" FontSize="12" Text="If you do not decompress them, you will not be able to open and edit these files." Grid.Row="2"   TextWrapping="Wrap" HorizontalAlignment="Left" Foreground="Red"  />
                 <CheckBox x:Name="cbOneDirectory" FontWeight="Normal" IsChecked="{Binding Path=OneFolder, Mode=TwoWay}" Grid.Row="3" Grid.ColumnSpan="3" FontFamily="{StaticResource Trajan Pro}" FontSize="16" Content="Extract files to one folder"/>
                 <TextBlock Visibility="{Binding ElementName=cbOneDirectory, Path=IsChecked, Converter={StaticResource ReverseVisibilityConverter}}" Grid.ColumnSpan="3" FontWeight="Normal" FontSize="12" Text="Useful to display files together at once and have a clear view in Windows Explorer." Grid.Row="4"   TextWrapping="Wrap" HorizontalAlignment="Left" Foreground="Red"  />
-                <CheckBox x:Name="cbSavePNGasBMP" FontWeight="Normal" IsChecked="{Binding Path=SavePNGasBMP, Mode=TwoWay}" Grid.Row="5" Grid.ColumnSpan="3" FontFamily="{StaticResource Trajan Pro}" FontSize="16" Content="Extract PNG images as BMP images"/>
-                <TextBlock Visibility="{Binding ElementName=cbSavePNGasBMP, Path=IsChecked, Converter={StaticResource VisibilityConverter}}" Grid.ColumnSpan="3" FontWeight="Normal" FontSize="12" Text="Saving as BMP will remove the transparent part and replace it with the base texture that usually goes on top of the player color ingame." Grid.Row="6"   TextWrapping="Wrap" HorizontalAlignment="Left" Foreground="Red"  />
 
             </Grid>
         </GroupBox>
 
-        <GroupBox FontFamily="{StaticResource Trajan Pro}" FontSize="16" FontWeight="Bold"  Header=".DDT Settings:"  Margin="0,10" Grid.Row="1">
+        <GroupBox FontFamily="{StaticResource Trajan Pro}" FontSize="16" FontWeight="Bold"  Header="Images Settings:"  Margin="0,10" Grid.Row="1">
             <Grid VerticalAlignment="Stretch">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto"/>
@@ -59,14 +58,34 @@
                     <ColumnDefinition Width="auto"/>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
                     <RowDefinition/>
                     <RowDefinition/>
                 </Grid.RowDefinitions>
                 <CheckBox FontWeight="Normal" IsChecked="{Binding Path=AutoDDTToPNGConversion, Mode=TwoWay}" Grid.Row="0" Grid.ColumnSpan="3" FontFamily="{StaticResource Trajan Pro}" FontSize="16" Content="Auto convert .DDT files to .PNG"/>
                 <CheckBox FontWeight="Normal" IsChecked="{Binding Path=AutoDDTToTGAConversion, Mode=TwoWay}" Grid.Row="1" Grid.ColumnSpan="3" FontFamily="{StaticResource Trajan Pro}" FontSize="16" Content="Auto convert .DDT files to .TGA"/>
+                <StackPanel Grid.Row="2" Grid.ColumnSpan="3" Orientation="Horizontal">
+                <colorpicker:PortableColorPicker
+                                            x:Name="ColorPicker"
+                    FontFamily="Segoe UI"
+                    FontWeight="Normal" FontSize="12"
+                                          Margin="0,0,10,0"
+                                            Width="16"
+                                            Height="16"
+                    ShowAlpha="False"
+                    Cursor="Hand"
+                                            ToolTip="Select Color"
+                                            
+                                            
+                                            SmallChange="5" ColorChanged="ColorPicker_ColorChanged" />
+                    <CheckBox VerticalContentAlignment="Center" x:Name="cbSavePNGasBMP" FontWeight="Normal" IsChecked="{Binding Path=SavePNGasBMP, Mode=TwoWay}"  FontFamily="{StaticResource Trajan Pro}" FontSize="16" Content="Apply color instead of the transparent part for .PNG" />
+                </StackPanel>
+                <TextBlock Visibility="{Binding ElementName=cbSavePNGasBMP, Path=IsChecked, Converter={StaticResource VisibilityConverter}}" Grid.ColumnSpan="3" FontWeight="Normal" FontSize="12" Text="Attention! The color overlay replaces the transparent part of the images and is used for portrait icons. Do not use for other transparent images." Grid.Row="3"   TextWrapping="Wrap" HorizontalAlignment="Left" Foreground="Red"  />
+
             </Grid>
         </GroupBox>
-        <GroupBox FontFamily="{StaticResource Trajan Pro}" FontSize="16" FontWeight="Bold"  Header=".XMB Settings:"  Margin="0,10" Grid.Row="2">
+        <GroupBox FontFamily="{StaticResource Trajan Pro}" FontSize="16" FontWeight="Bold"  Header=".XMB (.XML) Settings:"  Margin="0,10" Grid.Row="2">
             <Grid VerticalAlignment="Stretch">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto"/>
@@ -75,8 +94,10 @@
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition/>
+                    <RowDefinition/>
                 </Grid.RowDefinitions>
-                <CheckBox FontWeight="Normal" IsChecked="{Binding Path=AutoXMBConversion, Mode=TwoWay}" Grid.Row="1" Grid.ColumnSpan="3" FontFamily="{StaticResource Trajan Pro}" FontSize="16" Content="Auto convert .XMB files to .XML"/>
+                <CheckBox FontWeight="Normal" IsChecked="{Binding Path=AutoXMBConversion, Mode=TwoWay}" Grid.Row="0" Grid.ColumnSpan="3" FontFamily="{StaticResource Trajan Pro}" FontSize="16" Content="Auto convert .XMB files to .XML"/>
+                <CheckBox FontWeight="Normal" IsChecked="{Binding Path=AutoJSONConversion, Mode=TwoWay}" Grid.Row="1" Grid.ColumnSpan="3" FontFamily="{StaticResource Trajan Pro}" FontSize="16" Content="Auto convert .XMB (.XML) files to .JSON"/>
             </Grid>
         </GroupBox>
         <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center">
