@@ -2,6 +2,7 @@
 [![GitHub stars](https://img.shields.io/github/stars/VladTheJunior/Resource-Manager)](https://github.com/VladTheJunior/Resource-Manager/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/VladTheJunior/Resource-Manager)](https://github.com/VladTheJunior/Resource-Manager/network)
 [![GitHub issues](https://img.shields.io/github/issues/VladTheJunior/Resource-Manager)](https://github.com/VladTheJunior/Resource-Manager/issues)
+[![.NET6](https://github.com/KevinW1998/Resource-Manager/actions/workflows/dotnet6.yml/badge.svg)](https://github.com/KevinW1998/Resource-Manager/actions/workflows/dotnet6.yml)
 [![GitHub license](https://img.shields.io/github/license/VladTheJunior/Resource-Manager)](https://github.com/VladTheJunior/Resource-Manager/blob/master/LICENSE)
 <!-- PROJECT LOGO -->
 <br />
@@ -16,8 +17,12 @@
 *Utility for viewing, comparing, creating and extracting files from Age of Empires III .BAR archive*
 
 **Developer:** VladTheJunior and Kevsoft<br />
-**Current version:** 0.4.4<br />
-[Download Installer from Google Drive](https://drive.google.com/file/d/1iNoxk92WHFlgdtUtiWxXhCKpMUcmhOgn/view?usp=sharing)<br />
+**Current version:** 0.4.5<br />
+
+[Download Portable](https://github.com/VladTheJunior/Resource-Manager/releases/latest/download/ResourceManager.zip)<br />
+[Download Installer from Google Drive](https://drive.google.com/file/d/1GjVmzKMvATIHdrxo3i4OIvt4-LMNoOtM/view?usp=sharing)<br />
+
+*__Note__: Portable version may require .NET6 desktop runtime: https://dotnet.microsoft.com/en-us/download/dotnet/6.0*
 
 ## Table of Contents
 * [About the Project](#about-the-project)
@@ -45,6 +50,7 @@ The updated version includes all **(x)** functions that were in AoE3Ed Viewer, a
 * Calculation of CRC (optional).
 * The size of the selected entries.
 * Detail of entry file.
+* Copy path of entry to clipboard.
 
 **Conversion:**
 * Converting XML <-> XMB (both Legacy and DE).
@@ -55,6 +61,8 @@ The updated version includes all **(x)** functions that were in AoE3Ed Viewer, a
 * Extract all files.
 * Extract selected files.
 * Extract files to one folder.
+* Extract from list of paths.
+* Entries details as JSON.
 
 **Other:**
 * Comparison of BAR archives.
@@ -66,14 +74,11 @@ The updated version includes all **(x)** functions that were in AoE3Ed Viewer, a
 
 ## Latest Changes
 
-### Version 0.4.4
-* Changed option to extract PNG images as BMP images. Now it disabled by default.
-* Fixed BAR file creation for the latest BAR file version. 
-* Fixed files extraction.
-* Added different icons for compressed and encrypted BAR entries.
-* Added file association with .bar extension in Windows Explorer.
-* Added auto updater.
-* Migrated from .NET Core 3.1 to .NET 6
+### Version 0.4.5
+* Improved auto-updater. Now it shows more details.
+* Added feature to extract entries from list of paths (.txt file).
+* Added ability to copy entry path to clipboard.
+* Extraction Dialog remembers its own settings.
 
 ## Screenshots
 
