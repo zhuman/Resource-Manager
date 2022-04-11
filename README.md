@@ -17,10 +17,10 @@
 *Utility for viewing, comparing, creating and extracting files from Age of Empires III .BAR archive*
 
 **Developer:** VladTheJunior and Kevsoft<br />
-**Current version:** 0.4.6<br />
+**Current version:** 0.4.7<br />
 
 [Download Portable](https://github.com/VladTheJunior/Resource-Manager/releases/latest/download/ResourceManager.zip)<br />
-[Download Installer from Google Drive](https://drive.google.com/file/d/1u9j6MlQaXF6ZQQQTGULmKvhThgqXi0n8/view?usp=sharing)<br />
+[Download Installer from Google Drive](https://drive.google.com/file/d/1HQ1UzSThhSGhjUff-sMzQCcDyr6znxOU/view?usp=sharing)<br />
 
 *__Note__: Portable version may require .NET6 desktop runtime: https://dotnet.microsoft.com/en-us/download/dotnet/6.0*
 
@@ -36,7 +36,7 @@
 ## About The Project
 
 I would like to present to you a program for viewing, comparing, creating and extracting files from BAR archives of the Age of Empires 3: Definitive Edition (also supports AoE3 Legacy). This tool replaces the AoE3Ed Viewer developed by Ykkrosh, which does not work for the Definitive Edition.
-The updated version includes all **(x)** functions that were in AoE3Ed Viewer, as well as new features:
+The updated version includes all functions that were in AoE3Ed Viewer, as well as new features:
 
 **Preview:**
 * Syntax highlighting in previewing text files (xml, xs).
@@ -55,7 +55,7 @@ The updated version includes all **(x)** functions that were in AoE3Ed Viewer, a
 **Conversion:**
 * Converting XML <-> JSON <-> XMB (both Legacy and DE).
 * Converting DDT -> PNG.
-* Converting DDT -> TGA.
+* Converting DDT <-> TGA.
 
 **Extract:**
 * Extract all files.
@@ -63,21 +63,21 @@ The updated version includes all **(x)** functions that were in AoE3Ed Viewer, a
 * Extract files to one folder.
 * Extract from list of paths.
 * Entries details as JSON.
+* Exctract PNG with compression.
+* Extract PNG as WEBP.
 
 **Other:**
 * Comparison of BAR archives.
 * Create BAR archive from files and folders.
 
-
-**(x) Currently the application does not include the following features:**
-* Converting DDT <- TGA (it is recommended to use [Photoshop Plugin by kangcliff](http://aoe3.heavengames.com/cgi-bin/forums/display.cgi?action=ct&f=14,39229,,10)).
-
 ## Latest Changes
 
-### Version 0.4.6
-* The hash of the contents of the bar file is calculated when opened. This may increase the opening time.
-* Added XML<->XMB<->JSON conversion.
-* Removed the option to extract PNG as BMP, which was used to extract portrait icons without a transparent part. It has been replaced with a more convenient option that does not change the file format and allows you to choose the overlay color.
+### Version 0.4.7
+* Added TGA -> DDT conversion.
+* Added the option to extract PNG images in WEBP format.
+* Added the option to compress PNG images when extracting.
+* Fixed a bug with color overlay on portrait images.
+* Fixed a bug with storing extraction settings.
 
 ## Screenshots
 
