@@ -17,10 +17,10 @@
 *Utility for viewing, comparing, creating and extracting files from Age of Empires III .BAR archive*
 
 **Developer:** VladTheJunior and Kevsoft<br />
-**Current version:** 0.4.5<br />
+**Current version:** 0.4.6<br />
 
 [Download Portable](https://github.com/VladTheJunior/Resource-Manager/releases/latest/download/ResourceManager.zip)<br />
-[Download Installer from Google Drive](https://drive.google.com/file/d/1GjVmzKMvATIHdrxo3i4OIvt4-LMNoOtM/view?usp=sharing)<br />
+[Download Installer from Google Drive](https://drive.google.com/file/d/1u9j6MlQaXF6ZQQQTGULmKvhThgqXi0n8/view?usp=sharing)<br />
 
 *__Note__: Portable version may require .NET6 desktop runtime: https://dotnet.microsoft.com/en-us/download/dotnet/6.0*
 
@@ -53,7 +53,7 @@ The updated version includes all **(x)** functions that were in AoE3Ed Viewer, a
 * Copy path of entry to clipboard.
 
 **Conversion:**
-* Converting XML <-> XMB (both Legacy and DE).
+* Converting XML <-> JSON <-> XMB (both Legacy and DE).
 * Converting DDT -> PNG.
 * Converting DDT -> TGA.
 
@@ -74,18 +74,17 @@ The updated version includes all **(x)** functions that were in AoE3Ed Viewer, a
 
 ## Latest Changes
 
-### Version 0.4.5
-* Improved auto-updater. Now it shows more details.
-* Added feature to extract entries from list of paths (.txt file).
-* Added ability to copy entry path to clipboard.
-* Extraction Dialog remembers its own settings.
+### Version 0.4.6
+* The hash of the contents of the bar file is calculated when opened. This may increase the opening time.
+* Added XML<->XMB<->JSON conversion.
+* Removed the option to extract PNG as BMP, which was used to extract portrait icons without a transparent part. It has been replaced with a more convenient option that does not change the file format and allows you to choose the overlay color.
 
 ## Screenshots
 
 ![](Images/1.PNG)
 ![](Images/2.PNG)
 ![](Images/3.PNG)
-
+![](Images/4.PNG)
 
 <!-- LICENSE -->
 ## License
