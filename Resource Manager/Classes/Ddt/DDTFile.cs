@@ -8,41 +8,36 @@ using System.Windows.Media.Imaging;
 
 namespace Resource_Manager.Classes.Ddt
 {
-    public enum DdtFileTypeAlpha : byte
-    {
-        None = 0,
-        Player = 1,
-        Trans = 4,
-        Blend = 8
-    }
 
-    public enum DdtFileTypeFormat : byte
-    {
-        Bgra = 1,
-        Dxt1 = 4,
-        Dxt1DE = 5,
-        Grey = 7,
-        Dxt3 = 8,
-        Dxt5 = 9
-    }
 
-    public enum DdtFileTypeUsage : byte
+    public class DdtFileDepricated
     {
-        AlphaTest = 1,
-        LowDetail = 2,
-        Bump = 4,
-        Cube = 8
-    }
-
-    public class DdtFile
-    {
-        public DdtFile(byte[] data, bool AlphaPart)
+        public DdtFileDepricated(byte usage, byte alpha, byte format, byte mipmap_levels, ushort width, ushort height, byte[][] images)
+        {
+            Head = 0x33535452;
+            Usage = (DdtFileTypeUsage)usage;
+            Alpha = (DdtFileTypeAlpha)alpha;
+            Format = (DdtFileTypeFormat)format;
+            MipmapLevels = mipmap_levels;
+            BaseWidth = width;
+            BaseHeight = height;
+            var mipmaps = new List<DdtImage>();
+            var numImagesPerLevel = Usage.HasFlag(DdtFileTypeUsage.Cube) ? 6 : 1;
+            int Offset = 24;
+            for (var index = 0; index < MipmapLevels * numImagesPerLevel; ++index)
+            {
+                mipmaps.Add(new DdtImage(width, height, 16 + 8 * index, images[index].Length, images[index]));
+                Offset += images[index].Length + 8;
+            }
+            Images = new ReadOnlyCollection<DdtImage>(mipmaps);
+        }
+        public DdtFileDepricated(byte[] data, bool AlphaPart)
         {
             using (var stream = new MemoryStream(data))
             {
                 using (var binaryReader = new BinaryReader(stream))
                 {
-                    Head = new string(binaryReader.ReadChars(4));
+                    Head = binaryReader.ReadUInt32();
                     Usage = (DdtFileTypeUsage)binaryReader.ReadByte();
                     Alpha = (DdtFileTypeAlpha)binaryReader.ReadByte();
                     Format = (DdtFileTypeFormat)binaryReader.ReadByte();
@@ -71,7 +66,7 @@ namespace Resource_Manager.Classes.Ddt
             Bitmap = GetBitmap(AlphaPart);
         }
 
-        public string Head { get; }
+        public uint Head { get; }
         public DdtFileTypeUsage Usage { get; }
         public DdtFileTypeAlpha Alpha { get; }
         public DdtFileTypeFormat Format { get; }
@@ -101,12 +96,13 @@ namespace Resource_Manager.Classes.Ddt
                     bw.Write((byte)Alpha);
                     bw.Write((byte)Format);
                     bw.Write(MipmapLevels);
-                    bw.Write(BaseWidth);
-                    bw.Write(BaseHeight);
+                    bw.Write((int)BaseWidth);
+                    bw.Write((int)BaseHeight);
                     foreach (var image in Images)
                     {
-                        bw.Write(image.Length);
                         bw.Write(image.Offset);
+                        bw.Write(image.Length);
+                        
                     }
                     foreach (var image in Images)
                         bw.Write(image.RawData);

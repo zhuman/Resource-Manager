@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Resource Manager"
-#define MyAppVersion "0.4.6"
+#define MyAppVersion "0.4.7"
 #define MyAppPublisher "VladTheJunior"
 #define MyAppExeName "ResourceManagerUpdater.exe"
 #define MyAppMainExeName "Resource Manager.exe"
@@ -43,6 +43,13 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 
 [Files]
 Source: "publish\Release\net6.0-windows\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "publish\Release\net6.0-windows\libwebp_x64.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "publish\Release\net6.0-windows\libwebp_x86.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "publish\Release\net6.0-windows\SixLabors.ImageSharp.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "publish\Release\net6.0-windows\BCnEncoder.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "publish\Release\net6.0-windows\BCnEncoder.NET.ImageSharp.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "publish\Release\net6.0-windows\pngquant.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "publish\Release\net6.0-windows\Microsoft.Toolkit.HighPerformance.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "publish\Release\net6.0-windows\Microsoft.Xaml.Behaviors.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "publish\Release\net6.0-windows\ColorPicker.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "publish\Release\net6.0-windows\Newtonsoft.Json.dll"; DestDir: "{app}"; Flags: ignoreversion

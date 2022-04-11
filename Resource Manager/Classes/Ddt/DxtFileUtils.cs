@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 
 #region License
@@ -534,7 +535,106 @@ namespace Resource_Manager.Classes.Ddt
             temp = (color & 0x001F) * 255 + 16;
             b = (byte)((temp / 32 + temp) / 32);
         }
+/*
+        private static byte[] prepare_to_encoding(byte[] data, byte format, byte usage) 
+        {
+            List<byte> image = new List<byte>();
+            var Usage = (DdtFileTypeUsage)usage;
+            foreach (var chunk in data.Chunk(4))
+            {
+                byte b = chunk[0];
+                byte g = chunk[1];
+                byte r;
+                byte a;
 
-        #endregion
+                if (Usage.HasFlag(DdtFileTypeUsage.Bump) && format == 9)
+                {
+                    r = chunk[3];
+                    a = chunk[2];
+                }
+                else
+                {
+                    r = chunk[2];
+                    a = chunk[3];
+                }
+
+                if (format == 4 || format == 5)
+                {
+                    image.Add(r);
+                    image.Add(g);
+                    image.Add(b);
+                }
+                else
+                {
+                    image.Add(r);
+                    image.Add(g);
+                    image.Add(b);
+                    image.Add(a);
+                }
+            }
+            return image.ToArray();
     }
+
+        private static int decoded_bytes_per_block(byte format)
+        {
+        if (format == 4 || format == 5) {
+                return 48;
+        }
+        else {
+                return 64;
+        }
+    }
+         public static byte[] compress(byte[] data, byte format, byte usage, ushort width, ushort height)
+            {
+
+        byte[] image = prepare_to_encoding(data, format, usage);
+
+        var width_blocks = width / 4;
+        var height_blocks = height / 4;
+        var stride = decoded_bytes_per_block(format);
+
+        List<byte> res = new List<byte>();
+        foreach (var chunk in data.Chunk(width_blocks* stride))
+            {
+            byte[] buf;
+            if (format == 4 || format == 5)
+                {
+                buf = encode_dxt1_row(chunk);
+            }
+            else if (format == 8) {
+                buf = encode_dxt3_row(chunk);
+            }
+            else
+{
+    buf = encode_dxt5_row(chunk);
+}
+res.AddRange(buf);
+        }
+        return res.ToArray();
+    }
+        public static byte[] encode_dxt1_block(byte[] source)
+        {
+            encode_dxt_colors(source, dest);
+        }
+
+        public static byte[] encode_dxt1_row(byte[] source)
+        {
+        var block_count = source.Length / 48;
+        List<byte> dest = new List<byte>();
+        byte[] decoded_block = new byte[48];
+        for (int x=0; x<block_count; x++)
+        {
+            for (int line = 0; line<4;line++)
+                {
+                var offset = (block_count * line + x) * 12;
+                decoded_block[line * 12..(line + 1) * 12].copy_from_slice(&source[offset..offset + 12]);
+            }
+
+               dest.AddRange(encode_dxt1_block(decoded_block));
+               
+            }
+        return dest.ToArray();
+    }*/
+    #endregion
+}
 }

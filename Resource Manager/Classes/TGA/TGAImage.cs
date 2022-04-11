@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Resource_Manager.Classes.TGA
 {
@@ -18,11 +19,11 @@ namespace Resource_Manager.Classes.TGA
         byte map_entry_size { get; set; }
         ushort x_origin { get; set; }
         ushort y_origin { get; set; }
-        ushort image_width { get; set; }
-        ushort image_height { get; set; }
+        public ushort image_width { get; set; }
+        public ushort image_height { get; set; }
         byte pixel_depth { get; set; }
         byte image_desc { get; set; }
-        byte[] raw_data { get; set; }
+        public byte[] raw_data { get; set; }
         public byte[] image_id { get; set; } = new byte[4];
 
         public TGAImage(ushort width, ushort height, byte usage, byte alpha, byte format, byte mipmap_levels, byte[] raw_data)
@@ -52,6 +53,43 @@ namespace Resource_Manager.Classes.TGA
             this.raw_data = raw_data;
             this.image_id = new byte[] { usage, alpha, format, mipmap_levels};
         }
+
+        public TGAImage(string filepath)
+        {
+            if (!File.Exists(filepath))
+                throw new Exception("TGA file does not exist!");
+            using var file = File.OpenRead(filepath);
+            var reader = new BinaryReader(file);
+
+            this.id_length = reader.ReadByte();
+            this.map_type = reader.ReadByte();
+            this.image_type = reader.ReadByte();
+            this.map_origin = reader.ReadUInt16();
+            this.map_length = reader.ReadUInt16();
+            this.map_entry_size = reader.ReadByte();
+            this.x_origin = reader.ReadUInt16();
+            this.y_origin = reader.ReadUInt16();
+            this.image_width = reader.ReadUInt16();
+            this.image_height = reader.ReadUInt16();
+            this.pixel_depth = reader.ReadByte();
+            this.image_desc = reader.ReadByte();
+            this.raw_data = reader.ReadBytes((int)(reader.BaseStream.Length - reader.BaseStream.Position));
+
+            string file_name = Path.GetFileName(filepath);
+            var splitted_name = file_name.Split('.');
+            if (splitted_name.Length != 3)
+            {
+                throw new Exception("Missing DDT details in filename");
+            }
+            var splitted_params = splitted_name[1].Split(new char[] {',', '(', ')'});
+            if (splitted_params.Length != 6)
+            {
+                throw new Exception("Missing params in DDT details");
+            }
+
+            this.image_id = new byte[] { Convert.ToByte(splitted_params[1]), Convert.ToByte(splitted_params[2]), Convert.ToByte(splitted_params[3]), Convert.ToByte(splitted_params[4]) };
+        }
+
 
         public byte[] ToByteArray()
         {

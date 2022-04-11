@@ -62,10 +62,17 @@
                     <RowDefinition/>
                     <RowDefinition/>
                     <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
                 </Grid.RowDefinitions>
                 <CheckBox FontWeight="Normal" IsChecked="{Binding Path=AutoDDTToPNGConversion, Mode=TwoWay}" Grid.Row="0" Grid.ColumnSpan="3" FontFamily="{StaticResource Trajan Pro}" FontSize="16" Content="Auto convert .DDT files to .PNG"/>
                 <CheckBox FontWeight="Normal" IsChecked="{Binding Path=AutoDDTToTGAConversion, Mode=TwoWay}" Grid.Row="1" Grid.ColumnSpan="3" FontFamily="{StaticResource Trajan Pro}" FontSize="16" Content="Auto convert .DDT files to .TGA"/>
-                <StackPanel Grid.Row="2" Grid.ColumnSpan="3" Orientation="Horizontal">
+                <CheckBox FontWeight="Normal" IsChecked="{Binding Path=AutoPNGToWEBPConversion, Mode=TwoWay}" Grid.Row="2" Grid.ColumnSpan="3" FontFamily="{StaticResource Trajan Pro}" FontSize="16" Content="Auto convert .PNG files to .WEBP"/>
+                <CheckBox x:Name="cbCompress" FontWeight="Normal" IsChecked="{Binding Path=CompressPNG, Mode=TwoWay}" Grid.Row="3" Grid.ColumnSpan="3" FontFamily="{StaticResource Trajan Pro}" FontSize="16" Content="Enable compression .PNG images."/>
+                <TextBlock Visibility="{Binding ElementName=cbCompress, Path=IsChecked, Converter={StaticResource ReverseVisibilityConverter}}" Grid.ColumnSpan="3" FontWeight="Normal" FontSize="12" Text="File size will be reduced by more than 70%." Grid.Row="4"   TextWrapping="Wrap" HorizontalAlignment="Left" Foreground="Red"  />
+
+                <StackPanel Grid.Row="5" Grid.ColumnSpan="3" Orientation="Horizontal">
                 <colorpicker:PortableColorPicker
                                             x:Name="ColorPicker"
                     FontFamily="Segoe UI"
@@ -81,7 +88,7 @@
                                             SmallChange="5" ColorChanged="ColorPicker_ColorChanged" />
                     <CheckBox VerticalContentAlignment="Center" x:Name="cbSavePNGasBMP" FontWeight="Normal" IsChecked="{Binding Path=SavePNGasBMP, Mode=TwoWay}"  FontFamily="{StaticResource Trajan Pro}" FontSize="16" Content="Apply color instead of the transparent part for .PNG" />
                 </StackPanel>
-                <TextBlock Visibility="{Binding ElementName=cbSavePNGasBMP, Path=IsChecked, Converter={StaticResource VisibilityConverter}}" Grid.ColumnSpan="3" FontWeight="Normal" FontSize="12" Text="Attention! The color overlay replaces the transparent part of the images and is used for portrait icons. Do not use for other transparent images." Grid.Row="3"   TextWrapping="Wrap" HorizontalAlignment="Left" Foreground="Red"  />
+                <TextBlock Visibility="{Binding ElementName=cbSavePNGasBMP, Path=IsChecked, Converter={StaticResource VisibilityConverter}}" Grid.ColumnSpan="3" FontWeight="Normal" FontSize="12" Text="Attention! The color overlay replaces the transparent part of the images and is used for portrait icons. Do not use for other transparent images." Grid.Row="6"   TextWrapping="Wrap" HorizontalAlignment="Left" Foreground="Red"  />
 
             </Grid>
         </GroupBox>

@@ -167,5 +167,29 @@ namespace Resource_Manager {
                 this["ExtractionOverlayColor"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ExtractionCompressPNG {
+            get {
+                return ((bool)(this["ExtractionCompressPNG"]));
+            }
+            set {
+                this["ExtractionCompressPNG"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ExtractionAutoPNGToWEBPConversion {
+            get {
+                return ((bool)(this["ExtractionAutoPNGToWEBPConversion"]));
+            }
+            set {
+                this["ExtractionAutoPNGToWEBPConversion"] = value;
+            }
+        }
     }
 }

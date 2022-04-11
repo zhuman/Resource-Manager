@@ -28,8 +28,22 @@ namespace Resource_Manager
         private bool autoXMBConversion = false;
         private bool autoJSONConversion = false;
         private bool autoDDTToPNGConversion = false;
+        private bool autoPNGToWEBPConversion = false;
         private bool autoDDTToTGAConversion = true;
+        private bool compressPNG = false;
 
+        public bool CompressPNG
+        {
+            get
+            {
+                return compressPNG;
+            }
+            set
+            {
+                compressPNG = value;
+                NotifyPropertyChanged();
+            }
+        }
         public Color OverlayColor
         {
             get
@@ -77,6 +91,19 @@ namespace Resource_Manager
             set
             {
                 autoDDTToPNGConversion = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public bool AutoPNGToWEBPConversion
+        {
+            get
+            {
+                return autoPNGToWEBPConversion;
+            }
+            set
+            {
+                autoPNGToWEBPConversion = value;
                 NotifyPropertyChanged();
             }
         }
@@ -140,14 +167,16 @@ namespace Resource_Manager
 
 
             OverlayColor = Settings.Default.ExtractionOverlayColor;
-            AutoDecompress = Settings.Default.ExtractionAutoDecompress ? Settings.Default.ExtractionAutoDecompress : true;
-            OneFolder = Settings.Default.ExtractionOneFolder ? Settings.Default.ExtractionOneFolder : false;
-            SavePNGasBMP = Settings.Default.ExtractionSavePNGasBMP ? Settings.Default.ExtractionSavePNGasBMP : false;
-            AutoXMBConversion = Settings.Default.ExtractionAutoXMBConversion ? Settings.Default.ExtractionAutoXMBConversion : false;
-            AutoJSONConversion = Settings.Default.ExtractionAutoJSONConversion ? Settings.Default.ExtractionAutoJSONConversion : false;
+            AutoDecompress = Settings.Default.ExtractionAutoDecompress;
+            OneFolder = Settings.Default.ExtractionOneFolder;
+            CompressPNG = Settings.Default.ExtractionCompressPNG;
+            SavePNGasBMP = Settings.Default.ExtractionSavePNGasBMP;
+            AutoXMBConversion = Settings.Default.ExtractionAutoXMBConversion;
+            AutoJSONConversion = Settings.Default.ExtractionAutoJSONConversion;
 
-            AutoDDTToPNGConversion = Settings.Default.ExtractionAutoDDTToPNGConversion ? Settings.Default.ExtractionAutoDDTToPNGConversion : false;
-            AutoDDTToTGAConversion = Settings.Default.ExtractionAutoDDTToTGAConversion ? Settings.Default.ExtractionAutoDDTToTGAConversion : true;
+            AutoPNGToWEBPConversion = Settings.Default.ExtractionAutoPNGToWEBPConversion;
+            AutoDDTToPNGConversion = Settings.Default.ExtractionAutoDDTToPNGConversion;
+            AutoDDTToTGAConversion = Settings.Default.ExtractionAutoDDTToTGAConversion;
             ColorPicker.SelectedColor = System.Windows.Media.Color.FromRgb(OverlayColor.R, OverlayColor.G, OverlayColor.B); 
         DataContext = this;
         }
@@ -172,6 +201,8 @@ namespace Resource_Manager
             if (Directory.Exists(ExportPath.Text))
             {
                 Path = ExportPath.Text;
+                Settings.Default.ExtractionAutoPNGToWEBPConversion = AutoPNGToWEBPConversion;
+                Settings.Default.ExtractionCompressPNG = CompressPNG;
                 Settings.Default.ExtractionOverlayColor = OverlayColor;
                 Settings.Default.ExtractionAutoDecompress = AutoDecompress;
                 Settings.Default.ExtractionOneFolder = OneFolder;

@@ -56,8 +56,8 @@ namespace Resource_Manager
             }
         }
 
-        private DdtFile previewDdt;
-        public DdtFile PreviewDdt
+        private Ddt previewDdt;
+        public Ddt PreviewDdt
         {
             get { return previewDdt; }
             set
@@ -146,8 +146,9 @@ namespace Resource_Manager
             }
 
 
-
-            PreviewDdt = new DdtFile(data, true);
+                var ddt = new Ddt();
+                await ddt.Create(data);
+                PreviewDdt =ddt;
                 var flagList = new List<string>();
                 if (PreviewDdt.Usage.HasFlag(DdtFileTypeUsage.AlphaTest))
                 {

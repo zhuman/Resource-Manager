@@ -483,7 +483,7 @@ namespace Resource_Manager
 
                         await Task.Run(async () =>
                         {
-                            await file.saveFiles(entries, RootPath, decompress, Token, ExtractDialog.AutoDDTToPNGConversion, ExtractDialog.AutoDDTToTGAConversion, ExtractDialog.AutoXMBConversion, ExtractDialog.OneFolder, ExtractDialog.SavePNGasBMP, ExtractDialog.AutoJSONConversion, ExtractDialog.OverlayColor);
+                            await file.saveFiles(entries, RootPath, decompress, Token, ExtractDialog.AutoDDTToPNGConversion, ExtractDialog.AutoDDTToTGAConversion, ExtractDialog.AutoXMBConversion, ExtractDialog.OneFolder, ExtractDialog.SavePNGasBMP, ExtractDialog.AutoJSONConversion, ExtractDialog.OverlayColor, ExtractDialog.CompressPNG, ExtractDialog.AutoPNGToWEBPConversion);
                         });
 
                     }
@@ -654,7 +654,7 @@ namespace Resource_Manager
 
             if (operationType == "totga")
             {
-                openFileDialog.Filter = "Age of Empires 3 ddt files (*.ddt)|*.ddt";
+                openFileDialog.Filter = "Age of Empires 3 DDT files (*.ddt)|*.ddt";
                 if (openFileDialog.ShowDialog() == true)
                 {
                     Settings.Default.lastConvertedPath = Path.GetDirectoryName(openFileDialog.FileName);
@@ -663,7 +663,30 @@ namespace Resource_Manager
                     {
                         try
                         {
-                            await DdtFileUtils.Ddt2TgaAsync(file);
+                            var ddt = new Ddt();
+                            await ddt.Create(file);
+                            await ddt.SaveAsTGA(file);
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show(ex.Message, "Conversion error - " + Path.GetFileName(file), MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
+                    }
+                }
+            }
+            if (operationType == "tgatoddt")
+            {
+                openFileDialog.Filter = "TGA files (*.tga)|*.tga";
+                if (openFileDialog.ShowDialog() == true)
+                {
+                    Settings.Default.lastConvertedPath = Path.GetDirectoryName(openFileDialog.FileName);
+                    Settings.Default.Save();
+                    foreach (var file in openFileDialog.FileNames)
+                    {
+                        try
+                        {
+                            var ddt = new Ddt();
+                            await ddt.FromPicture(file);
                         }
                         catch (Exception ex)
                         {
@@ -674,7 +697,7 @@ namespace Resource_Manager
             }
             if (operationType == "topng")
             {
-                openFileDialog.Filter = "Age of Empires 3 ddt files (*.ddt)|*.ddt";
+                openFileDialog.Filter = "Age of Empires 3 DDT files (*.ddt)|*.ddt";
                 if (openFileDialog.ShowDialog() == true)
                 {
                     Settings.Default.lastConvertedPath = Path.GetDirectoryName(openFileDialog.FileName);
@@ -683,7 +706,9 @@ namespace Resource_Manager
                     {
                         try
                         {
-                            await DdtFileUtils.Ddt2PngAsync(file);
+                            var ddt = new Ddt();
+                            await ddt.Create(file);
+                            await ddt.SaveAsPNG(file);
                         }
                         catch (Exception ex)
                         {
@@ -694,7 +719,7 @@ namespace Resource_Manager
             }
             if (operationType == "toxml")
             {
-                openFileDialog.Filter = "Age of Empires 3 xmb files (*.xmb)|*.xmb";
+                openFileDialog.Filter = "Age of Empires 3 XMB files (*.xmb)|*.xmb";
 
                 if (openFileDialog.ShowDialog() == true)
                 {
@@ -774,7 +799,7 @@ namespace Resource_Manager
             }
             if (operationType == "xmbtojson")
             {
-                openFileDialog.Filter = "Age of Empires 3 xmb files (*.xmb)|*.xmb";
+                openFileDialog.Filter = "Age of Empires 3 XMB files (*.xmb)|*.xmb";
 
                 if (openFileDialog.ShowDialog() == true)
                 {
@@ -814,7 +839,7 @@ namespace Resource_Manager
             }
             if (operationType == "xmltojson")
             {
-                openFileDialog.Filter = "Age of Empires 3 xml files (*.*)|*.*";
+                openFileDialog.Filter = "Age of Empires 3 XML files (*.*)|*.*";
 
                 if (openFileDialog.ShowDialog() == true)
                 {
@@ -884,7 +909,7 @@ namespace Resource_Manager
             }
             if (operationType == "toxmbde")
             {
-                openFileDialog.Filter = "Age of Empires 3 xml files (*.*)|*.*";
+                openFileDialog.Filter = "Age of Empires 3 XML files (*.*)|*.*";
 
                 if (openFileDialog.ShowDialog() == true)
                 {
@@ -905,7 +930,7 @@ namespace Resource_Manager
             }
             if (operationType == "toxmbcc")
             {
-                openFileDialog.Filter = "Age of Empires 3 xml files (*.*)|*.*";
+                openFileDialog.Filter = "Age of Empires 3 XML files (*.*)|*.*";
                 if (openFileDialog.ShowDialog() == true)
                 {
                     foreach (var file in openFileDialog.FileNames)

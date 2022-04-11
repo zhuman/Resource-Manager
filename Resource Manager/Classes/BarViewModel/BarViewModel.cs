@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using nQuant;
 using Pfim;
 using Resource_Manager.Classes.Alz4;
 using Resource_Manager.Classes.Bar;
@@ -22,6 +23,7 @@ using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Xml;
+using WebPWrapper;
 using Color = System.Drawing.Color;
 using ImageFormat = Pfim.ImageFormat;
 using PixelFormat = System.Drawing.Imaging.PixelFormat;
@@ -100,8 +102,8 @@ namespace Archive_Unpacker.Classes.BarViewModel
             }
         }
 
-        private DdtFile previewDdt;
-        public DdtFile PreviewDdt
+        private Ddt previewDdt;
+        public Ddt PreviewDdt
         {
             get { return previewDdt; }
             set
@@ -168,7 +170,7 @@ namespace Archive_Unpacker.Classes.BarViewModel
 
 
 
-        public async Task saveFiles(List<BarEntry> files, string savePath, bool Decompress, CancellationToken token, bool convertDDTToPNG, bool convertDDTToTGA, bool convertXMB, bool OneFolder, bool SavePNGasBMP, bool AutoJSONConversion, Color OverlayColor)
+        public async Task saveFiles(List<BarEntry> files, string savePath, bool Decompress, CancellationToken token, bool convertDDTToPNG, bool convertDDTToTGA, bool convertXMB, bool OneFolder, bool SavePNGasBMP, bool AutoJSONConversion, Color OverlayColor, bool CompressPNG, bool ConvertWEBP)
         {
             ResetProgress();
             if (files.Count == 0) return;
@@ -228,50 +230,104 @@ namespace Archive_Unpacker.Classes.BarViewModel
                     }
                 }
 
-                // Save PNG as BMP, skip saving as PNG
-                if (file.Extension == ".PNG" && SavePNGasBMP)
+                // Save PNG
+                if (file.Extension == ".PNG")
                 {
 
                     using var memory = new MemoryStream(data);
                     Bitmap img = new Bitmap(memory);
 
 
-                    PixelFormat fmt1 = img.PixelFormat;
-                    byte bpp1 = 4;
 
-                    Rectangle rect = new Rectangle(Point.Empty, new Size(img.Width, img.Height));
-                    BitmapData bmpData = img.LockBits(rect, ImageLockMode.ReadWrite, fmt1);
-
-                    int size1 = bmpData.Stride * bmpData.Height;
-                    byte[] pixels = new byte[size1];
-                    Marshal.Copy(bmpData.Scan0, pixels, 0, size1);
-
-                    for (int y = 0; y < img.Height; y++)
+                    // Color Overlay
+                    if (SavePNGasBMP && img.PixelFormat == System.Drawing.Imaging.PixelFormat.Format32bppArgb)
                     {
-                        for (int x = 0; x < img.Width; x++)
+                        PixelFormat fmt1 = img.PixelFormat;
+                        
+                        byte bpp1 = 4;
+
+                        Rectangle rect = new Rectangle(Point.Empty, new Size(img.Width, img.Height));
+                        BitmapData bmpData = img.LockBits(rect, ImageLockMode.ReadWrite, fmt1);
+
+                        int size1 = bmpData.Stride * bmpData.Height;
+                        byte[] pixels = new byte[size1];
+                        Marshal.Copy(bmpData.Scan0, pixels, 0, size1);
+
+                        for (int y = 0; y < img.Height; y++)
                         {
-                            int index = y * bmpData.Stride + x * bpp1;
-                            var alpha = pixels[index + 3];
-                            if (alpha < 255)
+                            for (int x = 0; x < img.Width; x++)
                             {
-                                
-                                pixels[index] = (byte)(pixels[index]* OverlayColor.B / 255);  //b
-                                pixels[index + 1] = (byte)(pixels[index + 1] * OverlayColor.G / 255); //g
-                                pixels[index + 2] = (byte)(pixels[index + 2] * OverlayColor.R / 255); //r
-                                pixels[index + 3] = 255; 
+                                int index = y * bmpData.Stride + x * bpp1;
+                                var alpha = pixels[index + 3];
+                                if (alpha < 255)
+                                {
+
+                                    pixels[index] = (byte)(pixels[index] * OverlayColor.B / 255);  //b
+                                    pixels[index + 1] = (byte)(pixels[index + 1] * OverlayColor.G / 255); //g
+                                    pixels[index + 2] = (byte)(pixels[index + 2] * OverlayColor.R / 255); //r
+                                    pixels[index + 3] = 255;
+                                }
+
                             }
+                        }
+
+                        Marshal.Copy(pixels, 0, bmpData.Scan0, pixels.Length);
+                        img.UnlockBits(bmpData);
+                        using (Graphics g = Graphics.FromImage(img))
+                        {
+                            g.DrawImage(new Bitmap(memory), Point.Empty);
 
                         }
                     }
 
-                    Marshal.Copy(pixels, 0, bmpData.Scan0, pixels.Length);
-                    img.UnlockBits(bmpData);
-                    using (Graphics g = Graphics.FromImage(img))
+                    // Convert to WEBP
+                    if (ConvertWEBP)
                     {
-                        g.DrawImage(new Bitmap(memory), Point.Empty);
-                        
+
+                        using (WebP webp = new WebP())
+                        {
+                            byte[] webpData = webp.EncodeLossy(img, 75);
+                            await File.WriteAllBytesAsync(Path.ChangeExtension(ExtractPath, "webp"), webpData);
+                        }
+                            
                     }
-                    img.Save(ExtractPath, System.Drawing.Imaging.ImageFormat.Png);
+                    
+                    // Compressing
+                    if (CompressPNG)
+                    {
+                        ImageConverter converter = new ImageConverter();
+                        byte[] uncompressed = (byte[])converter.ConvertTo(img, typeof(byte[]));
+                        ProcessStartInfo info = new ProcessStartInfo()
+                        {
+                            CreateNoWindow = true,
+                            FileName = Path.Combine(Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName), "pngquant.exe"),
+                            Arguments = "--quality=45-85 -",
+                            RedirectStandardInput = true,
+                            RedirectStandardOutput = true,
+                            UseShellExecute = false,
+                        };
+                        Process pro = Process.Start(info);
+                        using (MemoryStream outputStream = new MemoryStream())
+                        {
+                            await pro.StandardInput.BaseStream.WriteAsync(uncompressed, 0, uncompressed.Length);
+                            await pro.StandardInput.BaseStream.FlushAsync();
+                            await pro.StandardOutput.BaseStream.CopyToAsync(outputStream);
+                            byte[] output = outputStream.ToArray();
+                            await File.WriteAllBytesAsync(ExtractPath, output);
+
+                        }
+                       // var quantizer = new PnnQuant.PnnQuantizer();
+                       // using (var dest = quantizer.QuantizeImage(img, System.Drawing.Imaging.PixelFormat.Undefined, 256, true))
+                        //{
+                      //      dest.Save(ExtractPath, System.Drawing.Imaging.ImageFormat.Png);
+                      //  }
+                    }
+                    else
+                    {
+                        img.Save(ExtractPath, System.Drawing.Imaging.ImageFormat.Png);
+                    }
+
+
                     CurrentProgress += (double)file.FileSize2 / filesSize;
                     continue;
 
@@ -346,15 +402,16 @@ namespace Archive_Unpacker.Classes.BarViewModel
                 // Additionaly convert ddt to png
                 if (file.Extension == ".DDT" && convertDDTToPNG)
                 {
-
-                    await DdtFileUtils.DdtBytes2PngAsync(data, ExtractPath);
+                    var ddt = new Ddt();
+                    await ddt.Create(data);
+                    await ddt.SaveAsPNG(ExtractPath);
                 }
                 // Additionaly convert ddt to tga
                 if (file.Extension == ".DDT" && convertDDTToTGA)
                 {
-
-                    await DdtFileUtils.DdtBytes2TgaAsync(data, ExtractPath);
-
+                    var ddt = new Ddt();
+                    await ddt.Create(data);
+                    await ddt.SaveAsTGA(ExtractPath);
                 }
 
 
@@ -418,7 +475,9 @@ namespace Archive_Unpacker.Classes.BarViewModel
 
 
 
-                PreviewDdt = new DdtFile(data, true);
+                var ddt = new Ddt();
+                await ddt.Create(data);
+                PreviewDdt = ddt;
                 return;
             }
             if (file.Extension == ".BMP" || file.Extension == ".TGA" || file.Extension == ".PNG" || file.Extension == ".CUR" || file.Extension == ".JPG")
