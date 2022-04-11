@@ -24,6 +24,8 @@
 
 *__Note__: Portable version may require .NET6 desktop runtime: https://dotnet.microsoft.com/en-us/download/dotnet/6.0*
 
+You can also join my discord server to stay up to date with the latest updates and news about my current developments and projects: [Commando Squad](https://discord.gg/egcZRKgj4q)
+
 ## Table of Contents
 * [About the Project](#about-the-project)
 * [Latest Changes](#latest-changes)
