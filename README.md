@@ -17,14 +17,14 @@
 *Utility for viewing, comparing, creating and extracting files from Age of Empires III .BAR archive*
 
 **Developer:** VladTheJunior and Kevsoft<br />
-**Current version:** 0.4.7<br />
+**Current version:** 0.4.8<br />
 
 [Download Portable](https://github.com/VladTheJunior/Resource-Manager/releases/latest/download/ResourceManager.zip)<br />
-[Download Installer from Google Drive](https://drive.google.com/file/d/1HQ1UzSThhSGhjUff-sMzQCcDyr6znxOU/view?usp=sharing)<br />
+[Download Installer from Google Drive](https://drive.google.com/file/d/1QRfTzR_bUROG-XXv5UY1B8zRQqfUg5Tn/view?usp=sharing)<br />
 
 *__Note__: Portable version may require .NET6 desktop runtime: https://dotnet.microsoft.com/en-us/download/dotnet/6.0*
 
-You can also join my discord server to stay up to date with the latest updates and news about my current developments and projects: [Commando Squad](https://discord.gg/egcZRKgj4q)
+You can also join my Discord server to stay up to date with the latest updates and news about my current developments and projects: [Commando Squad](https://discord.gg/egcZRKgj4q)
 
 ## Table of Contents
 * [About the Project](#about-the-project)
@@ -49,7 +49,8 @@ The updated version includes all functions that were in AoE3Ed Viewer, as well a
 * Grouping files by their format (optional).
 * Sort by name, size, creation date.
 * Search in the BAR archive.
-* Calculation of CRC (optional).
+* BAR caching and versioning.
+* Calculation of Hash.
 * The size of the selected entries.
 * Detail of entry file.
 * Copy path of entry to clipboard.
@@ -74,12 +75,12 @@ The updated version includes all functions that were in AoE3Ed Viewer, as well a
 
 ## Latest Changes
 
-### Version 0.4.7
-* Added TGA -> DDT conversion.
-* Added the option to extract PNG images in WEBP format.
-* Added the option to compress PNG images when extracting.
-* Fixed a bug with color overlay on portrait images.
-* Fixed a bug with storing extraction settings.
+### Version 0.4.8
+* Added BAR structure caching and versioning combined with fast hash algorithm.
+* Added a link to the Google form for leaving feedback. 
+* Accelerated opening of BAR files and checking for updates by using a faster hash algorithm. 
+* Fixed freezes when extracting files from the list.
+* Fixed incorrect behavior when comparing BAR files.
 
 ## Screenshots
 
