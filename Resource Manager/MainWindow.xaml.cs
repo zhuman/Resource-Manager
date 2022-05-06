@@ -122,7 +122,7 @@ namespace Resource_Manager
 
             for (int i = 0; i < Math.Min(10, Settings.Default.RecentFiles.Count); i++)
                 recentFiles.Add(new RecentFile() { FileName = Settings.Default.RecentFiles[i], Title = Path.GetFileName(Settings.Default.RecentFiles[i]), OnClickCommand = new RelayCommand<string>(openFile) });
-            MessageBox.Show(AppContext.BaseDirectory);
+
             if (File.Exists(Path.Combine(AppContext.BaseDirectory, "UpdateCounter.txt")))
             {
                 int counter = Convert.ToInt32(File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "UpdateCounter.txt")));
