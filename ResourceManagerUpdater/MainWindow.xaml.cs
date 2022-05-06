@@ -274,7 +274,7 @@ namespace ResourceManagerUpdater
 
             ClientUpdates.version = CurrentVersion;
             ClientUpdates.url = AvailableVersionUrl;
-            await File.WriteAllTextAsync("Updates.json", JsonSerializer.Serialize(ClientUpdates));
+            await File.WriteAllTextAsync(Path.Combine(AppContext.BaseDirectory,"Updates.json"), JsonSerializer.Serialize(ClientUpdates));
 
 
             ServerUpdates = await CheckUpdates();
