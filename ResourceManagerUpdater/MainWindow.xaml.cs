@@ -266,7 +266,7 @@ namespace ResourceManagerUpdater
             foreach (string path in updateFiles)
             {
                 Progress = (double)index / (double)updateFiles.Count();
-                ClientUpdates.files.Add(new Update { name = Path.GetFileName(path), size = new FileInfo(path).Length, install_path = path.Remove(0, AppContext.BaseDirectory.Length + 1), md5 = await CalculateMD5(path), url = new Uri(new Uri("https://raw.githubusercontent.com/VladTheJunior/ResourceManagerUpdates/master/"), path.Remove(0, AppContext.BaseDirectory.Length + 1)).ToString() });
+                ClientUpdates.files.Add(new Update { name = Path.GetFileName(path), size = new FileInfo(path).Length, install_path = path.Remove(0, AppContext.BaseDirectory.Length), md5 = await CalculateMD5(path), url = new Uri(new Uri("https://raw.githubusercontent.com/VladTheJunior/ResourceManagerUpdates/master/"), path.Remove(0, AppContext.BaseDirectory.Length)).ToString() });
                 ProgressText = $"Checking: file {index} of {updateFiles.Count()}";
                 UpdateName = Path.GetFileName(path);
                 index++;
