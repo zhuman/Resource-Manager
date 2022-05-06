@@ -69,8 +69,8 @@
                     </TextBlock.Text>
                 </TextBlock>
 
-                <TextBlock Grid.Row="1" Grid.Column="0" FontWeight="Normal" Text="CRC32 Hash: "/>
-                <TextBlock Grid.Row="1" Grid.Column="1" FontWeight="Normal" Text="{Binding entry.CRC32, StringFormat=X8}"/>
+                <TextBlock Grid.Row="1" Grid.Column="0" FontWeight="Normal" Text="Hash: "/>
+                <TextBlock Grid.Row="1" Grid.Column="1" FontWeight="Normal" Text="{Binding entry.Hash, StringFormat=X8}"/>
 
             </Grid>
         </GroupBox>

@@ -1,42 +1,29 @@
-﻿using Force.Crc32;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace Resource_Manager.Classes.Bar
 {
     public class BarFile
     {
-        public async void ComputeCRC32(string filename)
-        {
-            if (!File.Exists(filename))
-                throw new Exception("BAR file does not exist!");
-            using var file = File.OpenRead(filename);
-            var reader = new BinaryReader(file);
-            file.Seek(barFileHeader.FilesTableOffset, SeekOrigin.Begin);
-            foreach (var barEntry in BarFileEntrys)
-            {
-
-                reader.BaseStream.Seek(barEntry.Offset, SeekOrigin.Begin);
-                byte[] data = reader.ReadBytes(barEntry.FileSize2);
-                await Task.Run(() =>
-                {
-                    barEntry.CRC32 = Crc32Algorithm.Compute(data);
-                }
-                );
-            }
-        }
-        public async static Task<BarFile> Load(string filename, bool doCRC32)
+        public async static Task<BarFile> Load(string filename)
         {
 
             BarFile barFile = new BarFile();
             if (!File.Exists(filename))
                 throw new Exception("BAR file does not exist!");
+
+
             using var file = File.OpenRead(filename);
+            //byte[] asd = await new K4os.Hash.xxHash.XXH32().AsHashAlgorithm().ComputeHashAsync(file);
+            //file.Seek(0, SeekOrigin.Begin);
             var reader = new BinaryReader(file);
             barFile.barFileHeader = new BarFileHeader(reader);
             file.Seek(barFile.barFileHeader.FilesTableOffset, SeekOrigin.Begin);
@@ -50,21 +37,65 @@ namespace Resource_Manager.Classes.Bar
                 barFileEntrys.Add(BarEntry.Load(reader, barFile.barFileHeader.Version, barFile.RootPath));
             }
 
-            // TODO: Look for new date fields in BAR version 6
-
-
-            if (doCRC32)
+            using var mem = new MemoryStream();
+            var writer = new BinaryWriter(mem);
+            foreach (var barEntry in barFileEntrys)
             {
-                foreach (var barEntry in barFileEntrys)
-                {
 
-                    reader.BaseStream.Seek(barEntry.Offset, SeekOrigin.Begin);
-                    byte[] data = reader.ReadBytes(barEntry.FileSize2);
+                reader.BaseStream.Seek(barEntry.Offset, SeekOrigin.Begin);
+                byte[] data = reader.ReadBytes(barEntry.FileSize2);
+
+                await Task.Run(() =>
+                {
+                    barEntry.Hash = K4os.Hash.xxHash.XXH32.DigestOf(data); //Crc32Algorithm.Compute(data);
+                }
+                );
+                writer.Write(barEntry.Hash);
+            }
+
+            uint hash = K4os.Hash.xxHash.XXH32.DigestOf(mem.ToArray());
+
+            
+
+            string barDirectory = Path.Combine(AppContext.BaseDirectory, "Cached", Path.GetFileNameWithoutExtension(filename));
+
+            string cacheName = Path.Combine(barDirectory, hash.ToString("X8") + ".rmcache");
+
+            Directory.CreateDirectory(barDirectory);
+
+            if (!File.Exists(cacheName))
+            {
+                var json = JsonSerializer.Serialize(barFileEntrys);
+                await File.WriteAllTextAsync(cacheName, json);
+            }
+
+            FileInfo currentCacheInfo = new FileInfo(cacheName);
+
+            foreach (var cache in Directory.EnumerateFiles(barDirectory, "*.rmcache"))//.Where(x => x != cacheName))
+            {
+                FileInfo cacheInfo = new FileInfo(cache);
+                if (cacheInfo.CreationTime < currentCacheInfo.CreationTime)
+                {
+                    string json = await File.ReadAllTextAsync(cache);
+                    var c = JsonSerializer.Deserialize<List<cachedEntry>>(json);
                     await Task.Run(() =>
                     {
-                        barEntry.CRC32 = Crc32Algorithm.Compute(data);
-                    }
-                    );
+                        foreach (var barEntry in barFileEntrys)
+                        {
+                            barEntry.Changes.Add(new Tuple<string, DateTime>(barEntry.formattedHash, currentCacheInfo.CreationTime));
+                            var h = c.FirstOrDefault(x => barEntry.FileNameWithRoot.ToLower() == x.file.ToLower());
+
+                            if (h == null)
+                            {
+                                barEntry.Changes.Add(new Tuple<string, DateTime>(null, cacheInfo.CreationTime));
+                            }
+                            else
+                            {
+                                barEntry.Changes.Add(new Tuple<string, DateTime>(h.hash, cacheInfo.CreationTime));
+                            }
+                        }
+                    });
+                        
                 }
             }
 
@@ -110,9 +141,9 @@ namespace Resource_Manager.Classes.Bar
                         var data = await File.ReadAllBytesAsync(filePath);
                         await Task.Run(() =>
                         {
-                            entry.CRC32 = Crc32Algorithm.Compute(data);
+                            entry.Hash = K4os.Hash.xxHash.XXH32.DigestOf(data);
                         }
-                );
+                        );
                         writer.Write(data);
 
                         barEntrys.Add(entry);

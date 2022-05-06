@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Resource Manager"
-#define MyAppVersion "0.4.7"
+#define MyAppVersion "0.4.8"
 #define MyAppPublisher "VladTheJunior"
 #define MyAppExeName "ResourceManagerUpdater.exe"
 #define MyAppMainExeName "Resource Manager.exe"
@@ -53,7 +53,7 @@ Source: "publish\Release\net6.0-windows\Microsoft.Toolkit.HighPerformance.dll"; 
 Source: "publish\Release\net6.0-windows\Microsoft.Xaml.Behaviors.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "publish\Release\net6.0-windows\ColorPicker.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "publish\Release\net6.0-windows\Newtonsoft.Json.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "publish\Release\net6.0-windows\Crc32.NET.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "publish\Release\net6.0-windows\K4os.Hash.xxHash.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "publish\Release\net6.0-windows\DiffPlex.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "publish\Release\net6.0-windows\DiffPlex.Wpf.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "publish\Release\net6.0-windows\ICSharpCode.AvalonEdit.dll"; DestDir: "{app}"; Flags: ignoreversion

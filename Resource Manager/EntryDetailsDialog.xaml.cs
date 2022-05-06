@@ -1,5 +1,4 @@
-﻿using Force.Crc32;
-using Resource_Manager.Classes.Alz4;
+﻿using Resource_Manager.Classes.Alz4;
 using Resource_Manager.Classes.Bar;
 using Resource_Manager.Classes.Ddt;
 using Resource_Manager.Classes.L33TZip;
@@ -125,30 +124,26 @@ namespace Resource_Manager
 
             reader.BaseStream.Seek(entry.Offset, SeekOrigin.Begin);
             byte[] data = reader.ReadBytes(entry.FileSize2);
-            await Task.Run(() =>
-            {
-                entry.CRC32 = Crc32Algorithm.Compute(data);
-            });
             reader.BaseStream.Seek(entry.Offset, SeekOrigin.Begin);
             HeaderText = new string(reader.ReadChars(4));
             reader.BaseStream.Seek(entry.Offset, SeekOrigin.Begin);
             Header = reader.ReadInt32();
             if (entry.Extension == ".DDT")
-            { 
-            if (Alz4Utils.IsAlz4File(data))
             {
-                data = await Alz4Utils.ExtractAlz4BytesAsync(data);
-            }
-            else
-            {
-                if (L33TZipUtils.IsL33TZipFile(data))
-                    data = await L33TZipUtils.ExtractL33TZippedBytesAsync(data);
-            }
+                if (Alz4Utils.IsAlz4File(data))
+                {
+                    data = await Alz4Utils.ExtractAlz4BytesAsync(data);
+                }
+                else
+                {
+                    if (L33TZipUtils.IsL33TZipFile(data))
+                        data = await L33TZipUtils.ExtractL33TZippedBytesAsync(data);
+                }
 
 
                 var ddt = new Ddt();
                 await ddt.Create(data);
-                PreviewDdt =ddt;
+                PreviewDdt = ddt;
                 var flagList = new List<string>();
                 if (PreviewDdt.Usage.HasFlag(DdtFileTypeUsage.AlphaTest))
                 {
@@ -179,7 +174,7 @@ namespace Resource_Manager
         public EntryDetailsDialog(BarEntry e, string BarPath)
         {
             entry = e;
-            
+
             InitializeComponent();
             GetCustomValues(BarPath);
             DataContext = this;

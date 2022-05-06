@@ -6,9 +6,9 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:Resource_Manager"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    Title="{Binding file.barFileName, StringFormat='{}Resource Manager - {0}', FallbackValue='Resource Manager'}"
+    Title="{Binding file.barFileName, StringFormat='{}Resource Manager v0.4.8 - {0}', FallbackValue='Resource Manager v0.4.8'}"
     Width="1177"
-    Height="450"
+    Height="700"
     FontFamily="{StaticResource Trajan Pro}"
     FontSize="14"
     UseLayoutRounding="True"
@@ -344,7 +344,34 @@ Background="White"
 
 
                         </MultiDataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding IsLatestChange}" Value="True" />
+                                <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=(ItemsControl.AlternationIndex)}" Value="0" />
 
+                                <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource Self}}" Value="False" />
+                                <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Self}}" Value="False" />
+                            </MultiDataTrigger.Conditions>
+                            <MultiDataTrigger.Setters>
+                                <Setter Property="Background" Value="#2F008F00" />
+                            </MultiDataTrigger.Setters>
+
+
+                        </MultiDataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding IsLatestChange}" Value="True" />
+                                <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=(ItemsControl.AlternationIndex)}" Value="1" />
+
+                                <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource Self}}" Value="False" />
+                                <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Self}}" Value="False" />
+                            </MultiDataTrigger.Conditions>
+                            <MultiDataTrigger.Setters>
+                                <Setter Property="Background" Value="#1F008F00" />
+                            </MultiDataTrigger.Setters>
+
+
+                        </MultiDataTrigger>
                     </Style.Triggers>
                 </Style>
             </ListView.ItemContainerStyle>
@@ -458,7 +485,7 @@ Background="White"
                                 <TextBlock
                                     Text="{Binding Path=FileNameWithRoot}"
                                     TextTrimming="CharacterEllipsis"
-                                    ToolTip="{Binding Path=FileNameWithRoot}" />
+                                    ToolTip="{Binding Path=History}" />
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
@@ -487,13 +514,13 @@ Background="White"
                         <GridViewColumn.Header>
                             <GridViewColumnHeader
                                 Click="files_Click"
-                                Content="CRC32"
-                                Tag="CRC32" />
+                                Content="Hash"
+                                Tag="Hash" />
                         </GridViewColumn.Header>
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock
-                                    Text="{Binding Path=CRC32, StringFormat=X8}"
+                                    Text="{Binding Path=Hash, StringFormat=X8}"
                                     TextAlignment="Right"
                                     TextTrimming="CharacterEllipsis" />
                             </DataTemplate>
@@ -819,7 +846,20 @@ Background="White"
                                 </Style>
                             </MenuItem.ItemContainerStyle>
                         </MenuItem>
-                        <Separator />
+
+                <MenuItem
+                   
+                    Header="Clear Cache" Click="MenuItem_Click_9"
+                  >
+                    <MenuItem.Icon>
+                        <Viewbox Width="16" Height="16">
+                            <Canvas Width="24" Height="24">
+                                <Path Fill="Black" Data="M12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M11,5V3H13V5H11M11,21V19H13V21H11Z" />
+                            </Canvas>
+                        </Viewbox>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <Separator />
                         <MenuItem Click="MenuItem_Click_1" Header="Exit">
                             <MenuItem.Icon>
                                 <Viewbox
@@ -864,14 +904,15 @@ Background="White"
                     IsCheckable="True"
                     IsChecked="True"
                     Unchecked="MenuItem_Unchecked_1" />
-                   <!--     <MenuItem
-                    Checked="MenuItem_Checked_2"
-                    Header="Compute BAR Entries CRC32"
+                <MenuItem
+              
+                    Header="View Latest Changes in BAR file"
                     IsCheckable="True"
-                    IsChecked="False"
-                    Unchecked="MenuItem_Unchecked_2" />-->
-                    </MenuItem>
-                    <MenuItem>
+                    IsChecked="{Binding file.IsLatestChangesVisible, Mode=TwoWay}"
+                 />
+            </MenuItem>
+
+            <MenuItem>
                         <MenuItem.Header>
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock x:Name="tbExtract" Text="Extract" />
@@ -1379,7 +1420,25 @@ Background="White"
                         </Viewbox>
                     </MenuItem.Icon>
                         </MenuItem>
-                        <MenuItem Click="MenuItem_Click_3" Header="About">
+                <MenuItem Header="Leave Feedback" Click="MenuItem_Click_10">
+                    <MenuItem.Icon>
+                        <Viewbox Width="16" Height="16">
+                            <Canvas Width="24" Height="24">
+                                <Path Fill="Black" Data="M9 22C8.4 22 8 21.6 8 21V18H4C2.9 18 2 17.1 2 16V4C2 2.9 2.9 2 4 2H20C21.1 2 22 2.9 22 4V16C22 17.1 21.1 18 20 18H13.9L10.2 21.7C10 21.9 9.8 22 9.5 22H9M10 16V19.1L13.1 16H20V4H4V16H10M16.3 6L14.9 9H17V13H13V8.8L14.3 6H16.3M10.3 6L8.9 9H11V13H7V8.8L8.3 6H10.3Z" />
+                            </Canvas>
+                        </Viewbox>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Release Notes" Click="MenuItem_Click_11">
+                    <MenuItem.Icon>
+                        <Viewbox Width="16" Height="16">
+                            <Canvas Width="24" Height="24">
+                                <Path Fill="#FF1AA1E2" Data="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z" />
+                            </Canvas>
+                        </Viewbox>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Click="MenuItem_Click_3" Header="About">
                             <MenuItem.Icon>
                                 <Viewbox
                             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"

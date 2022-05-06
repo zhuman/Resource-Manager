@@ -430,13 +430,13 @@
                             <GridViewColumn.Header>
                                 <GridViewColumnHeader
                                     Click="files_Click"
-                                    Content="CRC32"
-                                    Tag="entryOld.CRC32" />
+                                    Content="Hash"
+                                    Tag="entryOld.Hash" />
                             </GridViewColumn.Header>
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBlock
-                                        Text="{Binding Path=entryOld.CRC32, StringFormat=X8}"
+                                        Text="{Binding Path=entryOld.Hash, StringFormat=X8}"
                                         TextAlignment="Right"
                                         TextTrimming="CharacterEllipsis" />
                                 </DataTemplate>
@@ -606,13 +606,13 @@
                             <GridViewColumn.Header>
                                 <GridViewColumnHeader
                                     Click="files_Click"
-                                    Content="CRC32"
-                                    Tag="entryNew.CRC32" />
+                                    Content="Hash"
+                                    Tag="entryNew.Hash" />
                             </GridViewColumn.Header>
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBlock
-                                        Text="{Binding Path=entryNew.CRC32, StringFormat=X8}"
+                                        Text="{Binding Path=entryNew.Hash, StringFormat=X8}"
                                         TextAlignment="Right"
                                         TextTrimming="CharacterEllipsis" />
                                 </DataTemplate>

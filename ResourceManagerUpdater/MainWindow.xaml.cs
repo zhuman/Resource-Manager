@@ -107,7 +107,7 @@ namespace ResourceManagerUpdater
         {
             get
             {
-                return "0.4.7";
+                return "0.4.8";
             }
         } 
         public string AvailableVersionUrl
@@ -142,20 +142,9 @@ namespace ResourceManagerUpdater
 
         static async Task<string> CalculateMD5(string filename)
         {
-            using (var md5 = MD5.Create())
-            {
-                byte[] data;
-                using (FileStream SourceStream = File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-                {
-                    data = new byte[SourceStream.Length];
-                    await SourceStream.ReadAsync(data, 0, (int)SourceStream.Length);
-                }
-
-                using var stream = new MemoryStream(data);
-                var hash = await md5.ComputeHashAsync(stream);
-                return BitConverter.ToString(hash).Replace("-", string.Empty).ToLowerInvariant();
-
-            }
+            using var file = File.OpenRead(filename);
+            byte[] hash = await new K4os.Hash.xxHash.XXH32().AsHashAlgorithm().ComputeHashAsync(file);
+            return BitConverter.ToString(hash).Replace("-", string.Empty).ToLowerInvariant();
         }
 
         private void DownloadFile(Queue<Update> urls)
@@ -168,8 +157,8 @@ namespace ResourceManagerUpdater
                 client.DownloadFileCompleted += client_DownloadFileCompleted;
 
                 var url = urls.Dequeue();
-                Directory.CreateDirectory(Path.GetDirectoryName(Path.Combine(Environment.CurrentDirectory, url.install_path)));
-                client.DownloadFileAsync(new Uri((url.url)), Path.Combine(Environment.CurrentDirectory, url.install_path));
+                Directory.CreateDirectory(Path.GetDirectoryName(Path.Combine(AppContext.BaseDirectory, url.install_path)));
+                client.DownloadFileAsync(new Uri((url.url)), Path.Combine(AppContext.BaseDirectory, url.install_path));
                 UpdateName = url.name;
 
 
@@ -189,7 +178,7 @@ namespace ResourceManagerUpdater
             ProcessStartInfo startInfo = new ProcessStartInfo("Update.bat");
             startInfo.CreateNoWindow = true;
             startInfo.UseShellExecute = false;
-            startInfo.WorkingDirectory = Environment.CurrentDirectory;
+            startInfo.WorkingDirectory = AppContext.BaseDirectory;
             Process.Start(startInfo);
             Environment.Exit(0);
         }
@@ -271,13 +260,13 @@ namespace ResourceManagerUpdater
         {
             AvailableVersion = "checking...";
             int index = 1;
-            var updateFiles = Directory.GetFiles(Environment.CurrentDirectory, "*.*", SearchOption.AllDirectories).Where(path => !path.Contains(".git")
-                    && Path.GetFileName(path) != "Updates.json"
+            var updateFiles = Directory.GetFiles(AppContext.BaseDirectory, "*.*", SearchOption.AllDirectories).Where(path => !path.Contains(".git")
+                    && Path.GetFileName(path) != "UpdateCounter.txt" && Path.GetFileName(path) != "Updates.json" && !path.Contains("Cached")
                     && Path.GetFileName(path) != ".gitignore" && Path.GetFileName(Path.GetDirectoryName(path)) != "Output");
             foreach (string path in updateFiles)
             {
                 Progress = (double)index / (double)updateFiles.Count();
-                ClientUpdates.files.Add(new Update { name = Path.GetFileName(path), size = new FileInfo(path).Length, install_path = path.Remove(0, Environment.CurrentDirectory.Length + 1), md5 = await CalculateMD5(path), url = new Uri(new Uri("https://raw.githubusercontent.com/VladTheJunior/ResourceManagerUpdates/master/"), path.Remove(0, Environment.CurrentDirectory.Length + 1)).ToString() });
+                ClientUpdates.files.Add(new Update { name = Path.GetFileName(path), size = new FileInfo(path).Length, install_path = path.Remove(0, AppContext.BaseDirectory.Length + 1), md5 = await CalculateMD5(path), url = new Uri(new Uri("https://raw.githubusercontent.com/VladTheJunior/ResourceManagerUpdates/master/"), path.Remove(0, AppContext.BaseDirectory.Length + 1)).ToString() });
                 ProgressText = $"Checking: file {index} of {updateFiles.Count()}";
                 UpdateName = Path.GetFileName(path);
                 index++;

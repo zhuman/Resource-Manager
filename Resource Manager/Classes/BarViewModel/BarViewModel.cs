@@ -49,7 +49,18 @@ namespace Archive_Unpacker.Classes.BarViewModel
             }
         }
 
+        private bool isLatestChangesVisible { get; set; } = false;
 
+        public bool IsLatestChangesVisible
+        {
+            get { return isLatestChangesVisible; }
+            set
+            {
+                isLatestChangesVisible = value;
+                NotifyPropertyChanged();
+                entriesCollection.View.Refresh();
+            }
+        }
         public string FilterText
         {
             get
@@ -130,17 +141,6 @@ namespace Archive_Unpacker.Classes.BarViewModel
             }
         }
 
-        private bool isCRC32Checked;
-        public bool IsCRC32Checked
-        {
-            get { return isCRC32Checked; }
-            set
-            {
-                isCRC32Checked = value;
-                NotifyPropertyChanged();
-            }
-        }
-
         public string barFileName
         {
             get
@@ -157,14 +157,27 @@ namespace Archive_Unpacker.Classes.BarViewModel
 
         void Filter(object sender, FilterEventArgs e)
         {
-            if (string.IsNullOrEmpty(FilterText))
+            if (string.IsNullOrEmpty(FilterText) && IsLatestChangesVisible == false)
             {
                 e.Accepted = true;
                 return;
             }
-
-            var entry = e.Item as BarEntry;
-            e.Accepted = entry.FileNameWithRoot.ToLower().Contains(FilterText.ToLower());
+            if (!string.IsNullOrEmpty(FilterText))
+            { 
+                var entry = e.Item as BarEntry;
+                if (IsLatestChangesVisible)
+                    e.Accepted = entry.FileNameWithRoot.ToLower().Contains(FilterText.ToLower()) && entry.IsLatestChange;
+                else
+                    e.Accepted = entry.FileNameWithRoot.ToLower().Contains(FilterText.ToLower());
+            }
+            else
+            {
+                var entry = e.Item as BarEntry;
+                if (IsLatestChangesVisible)
+                    e.Accepted = entry.IsLatestChange;
+                else
+                    e.Accepted = true;
+            }
         }
 
 
@@ -622,13 +635,12 @@ namespace Archive_Unpacker.Classes.BarViewModel
                     throw new Exception($"Unable to convert {image.Format} to WPF PixelFormat");
             }
         }
-        public async static Task<BarViewModel> Load(string filename, bool doCRC32)
+        public async static Task<BarViewModel> Load(string filename)
         {
             BarViewModel barViewModel = new BarViewModel();
             barViewModel.extractingState = 0;
             barViewModel.barFilePath = filename;
-            barViewModel.IsCRC32Checked = doCRC32;
-            barViewModel.barFile = await BarFile.Load(filename, doCRC32);
+            barViewModel.barFile = await BarFile.Load(filename);
 
             barViewModel.ResetProgress();
 
@@ -646,7 +658,6 @@ namespace Archive_Unpacker.Classes.BarViewModel
             var filename = rootFolder;
             if (rootFolder.EndsWith(Path.DirectorySeparatorChar.ToString()))
                 filename = rootFolder.Substring(0, rootFolder.Length - 1);
-            barViewModel.IsCRC32Checked = true;
             barViewModel.barFilePath = filename + ".bar";
             barViewModel.barFile = await BarFile.Create(rootFolder, version);
             barViewModel.entriesCollection = new CollectionViewSource();

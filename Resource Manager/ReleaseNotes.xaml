@@ -1,0 +1,86 @@
+﻿<Window x:Class="Resource_Manager.ReleaseNotes"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Resource_Manager"
+        mc:Ignorable="d"
+         SizeToContent="Height"
+        Width="534"
+        WindowStartupLocation="CenterScreen"
+        UseLayoutRounding="True"
+        ResizeMode="NoResize"
+        FontSize="14"
+        FontFamily="{StaticResource Trajan Pro}"
+        Title="Release Notes"  >
+    <Grid>
+        <Grid Margin="20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+
+            </Grid.RowDefinitions>
+
+
+            <Image
+                Grid.Row="0"
+                Grid.Column="0"
+                Width="64"
+                Height="64"
+                Margin="0,0,20,0"
+                Source="pack://application:,,,/icon.ico" />
+
+
+            <TextBlock
+                Grid.Row="0"
+                Grid.Column="1"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Center"
+                TextAlignment="Left">
+
+                <Run FontSize="22" Text="Release Notes" />
+
+                <LineBreak />
+                <Run FontSize="16"  Text="May 6, 2022"  />
+                <Run FontSize="14" Text="version: 0.4.8" TextDecorations="Underline"/>
+            </TextBlock>
+            <TextBlock
+                Grid.Row="1"
+      
+                TextWrapping="Wrap"
+                Grid.Column="0"
+                Grid.ColumnSpan="2" >
+                <LineBreak />
+                <Run FontWeight="Bold" Text=" − " />
+                <Run Text="Added BAR structure caching and versioning combined with fast hash algorithm." />
+                <LineBreak />
+                <Run FontWeight="Bold" Text=" − " />
+                <Run Text="Added a link to the Google form for leaving feedback." />   
+                <LineBreak />
+                <Run FontWeight="Bold" Text=" − " />
+                <Run Text="Accelerated opening of BAR files and checking for updates by using a faster hash algorithm." />   
+                              
+                <LineBreak />
+                <Run FontWeight="Bold" Text=" − " />
+                <Run Text="Fixed freezes when extracting files from the list." />
+                <LineBreak />
+                <Run FontWeight="Bold" Text=" − " />
+                <Run Text="Fixed incorrect behavior when comparing BAR files." />
+            </TextBlock>
+
+            <Button
+                Grid.Row="2"
+                Grid.ColumnSpan="2"
+                Width="75"
+                Margin="0,5,0,0"
+                Padding="0,3,0,0"
+                HorizontalAlignment="Center"
+                Content="OK" Click="Button_Click" />
+        </Grid>
+    </Grid>
+</Window>

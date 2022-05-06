@@ -1,8 +1,10 @@
 ﻿
 using Resource_Manager.Classes.Alz4;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -88,11 +90,78 @@ namespace Resource_Manager.Classes.Bar
             return barEntry;
         }
 
-        private uint crc32 { get; set; }
+        private uint hash { get; set; }
         [JsonPropertyName("compression")]
         public uint isCompressed { get; set; }
 
+        private List<Tuple<string, DateTime>> changes { get; set; } = new List<Tuple<string, DateTime>>();
 
+        [JsonIgnore]
+        public List<Tuple<string, DateTime>> Changes
+        {
+            get
+            {
+                return changes;
+            }
+            set
+            {
+                changes = value;
+                NotifyPropertyChanged();
+                NotifyPropertyChanged("History");
+            }
+        }
+
+        private bool isLatestChange { get; set; } = false;
+        [JsonIgnore]
+        public bool IsLatestChange
+        {
+            get { return isLatestChange; }
+            set { isLatestChange = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        [JsonIgnore]
+        public string History
+        {
+            get
+            {
+                var history = new List<string>();
+                history.Add(FileNameWithRoot);
+                var changes = Changes.OrderByDescending(t => t.Item2).ToList();
+
+                for (int i = 0; i < changes.Count - 1; i++)
+                {
+                    if (changes[i].Item1 != changes[i + 1].Item1)
+                    {
+                        if (changes[i].Item1 == null)
+                        {
+                            history.Add($"Removed on {changes[i].Item2.ToString("F")}");
+                        }
+                        if (changes[i + 1].Item1 == null)
+                        {
+                            history.Add($"Added {changes[i].Item1} on {changes[i].Item2.ToString("F")}");
+                            if (i == 0)
+                            {
+                                IsLatestChange = true;
+                            }
+                        }
+                        if (changes[i].Item1 != null && changes[i + 1].Item1 != null)
+                        {
+                            history.Add($"Changed {changes[i+1].Item1} -> {changes[i].Item1} on {changes[i].Item2.ToString("F")}");
+
+                            if (i == 0)
+                            {
+                                IsLatestChange = true;
+                            }
+                        }
+
+                    }
+                }
+
+                return string.Join(Environment.NewLine, history);
+            }
+        }
 
         [JsonIgnore]
         public string Extension
@@ -106,8 +175,7 @@ namespace Resource_Manager.Classes.Bar
         private string FileName { get; set; }
         [JsonPropertyName("file")]
         public string FileNameWithRoot { get; set; }
-
-        
+               
         [JsonIgnore]
         public long Offset { get; set; }
         [JsonIgnore]
@@ -126,25 +194,25 @@ namespace Resource_Manager.Classes.Bar
                 return new DateTime(LastWriteTime.Year, LastWriteTime.Month, LastWriteTime.Day, LastWriteTime.Hour, LastWriteTime.Minute, LastWriteTime.Second, LastWriteTime.Msecond, DateTimeKind.Utc);
             }
         }
-        [JsonPropertyName("crc32")]
-        public string formattedCRC32
+        [JsonPropertyName("hash")]
+        public string formattedHash
         {
             get
             {
-                return crc32.ToString("X8");
+                return Hash.ToString("X8");
             }
         }
 
         [JsonIgnore]
-        public uint CRC32
+        public uint Hash
         {
             get
             {
-                return crc32;
+                return hash;
             }
             set
             {
-                crc32 = value;
+                hash = value;
                 NotifyPropertyChanged();
             }
         }

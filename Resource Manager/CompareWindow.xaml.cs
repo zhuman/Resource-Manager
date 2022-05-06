@@ -136,7 +136,7 @@ namespace Resource_Manager
             {
                 minWidth = 130;
             }
-            if (header.Tag.ToString() == "entryOld.CRC32" || header.Tag.ToString() == "entryNew.CRC32")
+            if (header.Tag.ToString() == "entryOld.Hash" || header.Tag.ToString() == "entryNew.Hash")
             {
                 minWidth = 80;
             }
@@ -433,7 +433,7 @@ namespace Resource_Manager
                 Bar1 = null;
                 OldOpen.IsChecked = false;
                 NotifyPropertyChanged("Bar1");
-                Bar1 = await BarViewModel.Load(filePath, true);
+                Bar1 = await BarViewModel.Load(filePath);
                 NotifyPropertyChanged("Bar1");
                 OldOpen.IsChecked = true;
 
@@ -491,7 +491,7 @@ namespace Resource_Manager
                 Bar2 = null;
                 NewOpen.IsChecked = false;
                 NotifyPropertyChanged("Bar2");
-                Bar2 = await BarViewModel.Load(filePath, true);
+                Bar2 = await BarViewModel.Load(filePath);
                 NotifyPropertyChanged("Bar2");
                 NewOpen.IsChecked = true;
 

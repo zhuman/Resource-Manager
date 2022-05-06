@@ -58,7 +58,7 @@ namespace Resource_Manager
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        //public bool DoCRC32 = false;
+
 
         public ObservableCollection<RecentFile> recentFiles { get; set; } = new ObservableCollection<RecentFile>();
 
@@ -110,23 +110,35 @@ namespace Resource_Manager
         private GridViewColumnHeader listViewSortCol = null;
         private SortAdorner listViewSortAdorner = null;
         #endregion
-
+        int Version = 48;
         public MainWindow()
         {
             InitializeComponent();
             SearchPanel.Install(XMLViewer);
             DataContext = this;
             tempColumn = (files.View as GridView).Columns[3];
-            /*if (DoCRC32 == false)
-            {
-                (files.View as GridView).Columns.RemoveAt(3);
-            }*/
-            //cdGrid.Width = new GridLength(675, GridUnitType.Pixel);
+
             files.AddHandler(Thumb.DragDeltaEvent, new DragDeltaEventHandler(Thumb_DragDelta), true);
 
             for (int i = 0; i < Math.Min(10, Settings.Default.RecentFiles.Count); i++)
-
                 recentFiles.Add(new RecentFile() { FileName = Settings.Default.RecentFiles[i], Title = Path.GetFileName(Settings.Default.RecentFiles[i]), OnClickCommand = new RelayCommand<string>(openFile) });
+
+            if (File.Exists("UpdateCounter.txt"))
+            {
+                int counter = Convert.ToInt32(File.ReadAllText("UpdateCounter.txt"));
+                if (counter < Version)
+                {
+                    File.WriteAllText("UpdateCounter.txt", Version.ToString());
+                    ReleaseNotes window = new();
+                    window.ShowDialog();
+                }
+            }
+            else
+            {
+                File.WriteAllText("UpdateCounter.txt", Version.ToString());
+                ReleaseNotes window = new ReleaseNotes();
+                window.ShowDialog();
+            }
         }
 
 
@@ -295,7 +307,10 @@ namespace Resource_Manager
                 file = null;
                 NotifyPropertyChanged("recentFiles");
                 NotifyPropertyChanged("file");
-                file = await BarViewModel.Load(filePath, true/*DoCRC32*/);
+                // var stopwatch = new Stopwatch();
+                //stopwatch.Start();
+                file = await BarViewModel.Load(filePath);
+                //stopwatch.Stop();
                 if (Settings.Default.RecentFiles.Contains(filePath))
                 {
                     Settings.Default.RecentFiles.Remove(filePath);
@@ -406,7 +421,7 @@ namespace Resource_Manager
             {
                 minWidth = 160;
             }
-            if (header.Tag.ToString() == "CRC32")
+            if (header.Tag.ToString() == "Hash")
             {
                 minWidth = 100;
             }
@@ -450,8 +465,11 @@ namespace Resource_Manager
                 if (openFileDialog.ShowDialog() == true)
                 {
                     List<string> icons = new List<string>(await File.ReadAllLinesAsync(openFileDialog.FileName));
-                    entries = file.barFile.BarFileEntrys.Where(x =>
-                icons.Any(y => x.FileNameWithRoot.ToLower().EndsWith(y.Replace('/', '\\').ToLower()))).ToList();
+                    await Task.Run(() =>
+                    {
+                        entries = file.barFile.BarFileEntrys.Where(x =>
+                    icons.Any(y => x.FileNameWithRoot.ToLower().EndsWith(y.Replace('/', '\\').ToLower()))).ToList();
+                    });
 
                 }
             }
@@ -783,10 +801,10 @@ namespace Resource_Manager
                             }
                             string json = await File.ReadAllTextAsync(file);
                             var xml = JsonConvert.DeserializeXmlNode(json);
-                  
+
                             var newName = Path.ChangeExtension(file, "");
 
-                                
+
 
                             xml.Save(newName);
                         }
@@ -959,26 +977,12 @@ namespace Resource_Manager
         GridViewColumn tempColumn;
         private void MenuItem_Checked_2(object sender, RoutedEventArgs e)
         {
-           /* (files.View as GridView).Columns.Insert(3, tempColumn);
-            tempColumn.Width = 100;
-            cdGrid.Width = new GridLength(775, GridUnitType.Pixel);
-            if (file != null)
-            {
-                if (!file.IsCRC32Checked)
-                {
-                    file.barFile.ComputeCRC32(file.barFilePath);
-                    file.IsCRC32Checked = true;
-                }
-            }
-            DoCRC32 = true;*/
+
         }
 
         private void MenuItem_Unchecked_2(object sender, RoutedEventArgs e)
         {
-           /* tempColumn = (files.View as GridView).Columns[3];
-            (files.View as GridView).Columns.RemoveAt(3);
-            cdGrid.Width = new GridLength(675, GridUnitType.Pixel);
-            DoCRC32 = false;*/
+
         }
 
         private void MenuItem_Click_5(object sender, RoutedEventArgs e)
@@ -1046,7 +1050,7 @@ namespace Resource_Manager
 
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
-                var args = Environment.GetCommandLineArgs();
+            var args = Environment.GetCommandLineArgs();
             if (args.Length > 1 && Path.GetExtension(args[1]).ToUpper() == ".BAR")
             {
                 openFile(args[1]);
@@ -1072,6 +1076,33 @@ namespace Resource_Manager
             {
                 await File.WriteAllTextAsync(saveDialog.FileName, json);
             }
+        }
+
+        private void MenuItem_Click_9(object sender, RoutedEventArgs e)
+        {
+            string barDirectory = Path.Combine(AppContext.BaseDirectory, "Cached");
+            if (Directory.Exists(barDirectory))
+            {
+                Directory.Delete(barDirectory, true);
+            }
+
+        }
+
+        private void MenuItem_Click_10(object sender, RoutedEventArgs e)
+        {
+            string targetURL = "https://docs.google.com/forms/d/e/1FAIpQLSdWIaJ_Xlb-wdye5Rf1AtWSfcHhmaEN3nflYHcLEzrXZtnHmA/viewform?usp=sf_link";
+            var psi = new ProcessStartInfo
+            {
+                FileName = targetURL,
+                UseShellExecute = true
+            };
+            Process.Start(psi);
+        }
+
+        private void MenuItem_Click_11(object sender, RoutedEventArgs e)
+        {
+            ReleaseNotes window = new ReleaseNotes();
+            window.ShowDialog();
         }
     }
 
