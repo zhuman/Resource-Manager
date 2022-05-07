@@ -37,7 +37,7 @@ You can also join my Discord server to stay up to date with the latest updates a
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-I would like to present to you a program for viewing, comparing, creating and extracting files from BAR archives of the Age of Empires 3: Definitive Edition (also supports AoE3 Legacy). This tool replaces the AoE3Ed Viewer developed by Ykkrosh, which does not work for the Definitive Edition.
+I would like to present to you a program for viewing, comparing, creating and extracting files from BAR archives of the Age of Empires 3: Definitive Edition (also supports AoE3 Legacy). With this application, you can easily view and extract any content of the game. Tool replaces the AoE3Ed Viewer developed by Ykkrosh, which does not work for the Definitive Edition.
 The updated version includes all functions that were in AoE3Ed Viewer, as well as new features:
 
 **Preview:**
@@ -66,7 +66,7 @@ The updated version includes all functions that were in AoE3Ed Viewer, as well a
 * Extract files to one folder.
 * Extract from list of paths.
 * Entries details as JSON.
-* Exctract PNG with compression.
+* Extract PNG with compression.
 * Extract PNG as WEBP.
 
 **Other:**
