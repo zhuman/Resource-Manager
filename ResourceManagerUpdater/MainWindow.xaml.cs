@@ -107,7 +107,7 @@ namespace ResourceManagerUpdater
         {
             get
             {
-                return "0.4.8";
+                return "0.4.9";
             }
         } 
         public string AvailableVersionUrl

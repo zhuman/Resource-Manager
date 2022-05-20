@@ -8,7 +8,9 @@ using SixLabors.ImageSharp.Formats.Tga;
 using SixLabors.ImageSharp.PixelFormats;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 
@@ -77,7 +79,7 @@ namespace Resource_Manager.Classes.Ddt
                     BaseHeight = (ushort)binaryReader.ReadInt32();
                     List<byte> mipmaps = new List<byte>();
                     var numImagesPerLevel = Usage.HasFlag(DdtFileTypeUsage.Cube) ? 6 : 1;
-                    for (var index = 0; index < MipmapLevels * numImagesPerLevel; ++index)
+                    for (var index = 0; index < MipmapLevels * numImagesPerLevel; index++)
                     {
                         binaryReader.BaseStream.Position = 16 + 8 * index;
                         var width = BaseWidth >> (index / numImagesPerLevel);
@@ -90,10 +92,11 @@ namespace Resource_Manager.Classes.Ddt
                         var length = binaryReader.ReadInt32();
                         binaryReader.BaseStream.Position = offset;
                         mipmaps.AddRange(binaryReader.ReadBytes(length));
+                        break;
                     }
 
                     BcDecoder decoder = new BcDecoder();
-
+                    
                     Image<Rgba32> image;
                     switch (Format)
                     {
@@ -116,7 +119,7 @@ namespace Resource_Manager.Classes.Ddt
                             image = await decoder.DecodeRawToImageRgba32Async(mipmaps.ToArray(), BaseWidth, BaseHeight, BCnEncoder.Shared.CompressionFormat.R);
                             break;
                     }
-                    
+
 
                     if (Usage.HasFlag(DdtFileTypeUsage.Bump) && Format == DdtFileTypeFormat.Dxt5)
                     {
@@ -227,7 +230,7 @@ namespace Resource_Manager.Classes.Ddt
                             bw.Write(16 + 8 * MipmapLevels * numImagesPerLevel);
                         else
                         {
-                            bw.Write(16 + 8 * MipmapLevels * numImagesPerLevel + mipmaps[index - 1].Length);
+                            bw.Write(16 + 8 * MipmapLevels * numImagesPerLevel + mipmaps.ToList().GetRange(0, index).Sum(x => x.Length));
                         }
                         bw.Write(mipmaps[index].Length);
 

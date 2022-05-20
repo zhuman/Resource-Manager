@@ -1,12 +1,12 @@
 ﻿using Newtonsoft.Json;
-using nQuant;
-using Pfim;
 using Resource_Manager.Classes.Alz4;
 using Resource_Manager.Classes.Bar;
 using Resource_Manager.Classes.Ddt;
 using Resource_Manager.Classes.L33TZip;
 using Resource_Manager.Classes.sound;
 using Resource_Manager.Classes.Xmb;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats.Tga;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -25,8 +25,10 @@ using System.Windows.Media.Imaging;
 using System.Xml;
 using WebPWrapper;
 using Color = System.Drawing.Color;
-using ImageFormat = Pfim.ImageFormat;
 using PixelFormat = System.Drawing.Imaging.PixelFormat;
+using Point = System.Drawing.Point;
+using Rectangle = System.Drawing.Rectangle;
+using Size = System.Drawing.Size;
 
 namespace Archive_Unpacker.Classes.BarViewModel
 {
@@ -515,35 +517,16 @@ namespace Archive_Unpacker.Classes.BarViewModel
                 {
                     if (file.Extension == ".TGA")
                     {
-                        IImage image = await Task.Run(() => Pfim.Pfim.FromStream(stream));
-                        var pinnedArray = GCHandle.Alloc(image.Data, GCHandleType.Pinned);
-                        var addr = pinnedArray.AddrOfPinnedObject();
-                        var bsource = BitmapSource.Create(image.Width, image.Height, 96.0, 96.0,
-                            PixelFormat(image), null, addr, image.DataLen, image.Stride);
-                        PngBitmapEncoder encoder = new PngBitmapEncoder();
-                        MemoryStream memoryStream = new MemoryStream();
+             
+                        var image = await SixLabors.ImageSharp.Image.LoadAsync(stream);
 
-                        encoder.Frames.Add(BitmapFrame.Create(bsource));
-                        encoder.Save(memoryStream);
-                        memoryStream.Position = 0;
-                        bitmap.BeginInit();
-                        bitmap.StreamSource = memoryStream;
-                        bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                        bitmap.EndInit();
-                        bitmap.Freeze();
-                        memoryStream.Close();
-                    }
-                    /*else if (file.Extension == ".PNG")
-                    {
-                        System.Drawing.Image image = System.Drawing.Image.FromStream(stream);
-                        using var memory = new MemoryStream();
-                        image.Save(memory, System.Drawing.Imaging.ImageFormat.Bmp);
-                        memory.Seek(0, SeekOrigin.Begin);
+                    using MemoryStream memory = new MemoryStream();
+                        await image.SaveAsBmpAsync(memory);
                         bitmap.BeginInit();
                         bitmap.CacheOption = BitmapCacheOption.OnLoad;
                         bitmap.StreamSource = memory;
                         bitmap.EndInit();
-                    }*/
+                    }
                     else
                     {
                         bitmap.BeginInit();
@@ -616,25 +599,7 @@ namespace Archive_Unpacker.Classes.BarViewModel
             return;
         }
 
-        private static System.Windows.Media.PixelFormat PixelFormat(IImage image)
-        {
-            switch (image.Format)
-            {
-                case ImageFormat.Rgb24:
-                    return PixelFormats.Bgr24;
-                case ImageFormat.Rgba32:
-                    return PixelFormats.Bgr32;
-                case ImageFormat.Rgb8:
-                    return PixelFormats.Gray8;
-                case ImageFormat.R5g5b5a1:
-                case ImageFormat.R5g5b5:
-                    return PixelFormats.Bgr555;
-                case ImageFormat.R5g6b5:
-                    return PixelFormats.Bgr565;
-                default:
-                    throw new Exception($"Unable to convert {image.Format} to WPF PixelFormat");
-            }
-        }
+      
         public async static Task<BarViewModel> Load(string filename)
         {
             BarViewModel barViewModel = new BarViewModel();

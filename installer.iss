@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Resource Manager"
-#define MyAppVersion "0.4.8"
+#define MyAppVersion "0.4.9"
 #define MyAppPublisher "VladTheJunior"
 #define MyAppExeName "ResourceManagerUpdater.exe"
 #define MyAppMainExeName "Resource Manager.exe"
@@ -66,7 +66,6 @@ Source: "publish\Release\net6.0-windows\NAudio.Midi.dll"; DestDir: "{app}"; Flag
 Source: "publish\Release\net6.0-windows\NAudio.Wasapi.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "publish\Release\net6.0-windows\NAudio.WinForms.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "publish\Release\net6.0-windows\NAudio.WinMM.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "publish\Release\net6.0-windows\Pfim.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "publish\Release\net6.0-windows\Resource Manager.runtimeconfig.json"; DestDir: "{app}"; Flags: ignoreversion
 Source: "publish\Release\net6.0-windows\Resource Manager.deps.json"; DestDir: "{app}"; Flags: ignoreversion
 Source: "publish\Release\net6.0-windows\Resource Manager.dll"; DestDir: "{app}"; Flags: ignoreversion
@@ -82,8 +81,8 @@ Source: "publish\Release\net6.0-windows\zh-Hans\*"; DestDir: "{app}\zh-Hans"; Fl
 Source: "publish\Release\net6.0-windows\zh-Hant\*"; DestDir: "{app}\zh-Hant"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "publish\netcorecheck_x64.exe"; DestDir: "{tmp}"
 Source: "publish\netcorecheck.exe"; DestDir: "{tmp}"
-Source: "publish\windowsdesktop-runtime-6.0.3-win-x64.exe"; DestDir: "{tmp}"
-Source: "publish\windowsdesktop-runtime-6.0.3-win-x86.exe"; DestDir: "{tmp}"
+Source: "publish\windowsdesktop-runtime-6.0.5-win-x64.exe"; DestDir: "{tmp}"
+Source: "publish\windowsdesktop-runtime-6.0.5-win-x86.exe"; DestDir: "{tmp}"
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Registry]
@@ -99,8 +98,8 @@ Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
 
 [Run]
-Filename: "{tmp}\windowsdesktop-runtime-6.0.3-win-x86.exe"; Flags: runascurrentuser skipifdoesntexist; Check: (not IsWin64) and NotIsNetCoreInstalled86('Microsoft.NETCore.App 6.0.3')
-Filename: "{tmp}\windowsdesktop-runtime-6.0.3-win-x64.exe"; Flags: runascurrentuser skipifdoesntexist; Check: IsWin64 and NotIsNetCoreInstalled64('Microsoft.NETCore.App 6.0.3')
+Filename: "{tmp}\windowsdesktop-runtime-6.0.5-win-x86.exe"; Flags: runascurrentuser skipifdoesntexist; Check: (not IsWin64) and NotIsNetCoreInstalled86('Microsoft.NETCore.App 6.0.5')
+Filename: "{tmp}\windowsdesktop-runtime-6.0.5-win-x64.exe"; Flags: runascurrentuser skipifdoesntexist; Check: IsWin64 and NotIsNetCoreInstalled64('Microsoft.NETCore.App 6.0.5')
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: runascurrentuser nowait postinstall skipifsilent
 
 [Code]
