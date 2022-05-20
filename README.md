@@ -17,13 +17,13 @@
 *Utility for viewing, comparing, creating and extracting files from Age of Empires III .BAR archive*
 
 **Developer:** VladTheJunior and Kevsoft<br />
-**Current version:** 0.4.8<br />
+**Current version:** 0.4.9<br />
 
 [Download Portable](https://github.com/VladTheJunior/Resource-Manager/releases/latest/download/ResourceManager.zip)<br />
-[Download Installer from Google Drive](https://drive.google.com/file/d/1QRfTzR_bUROG-XXv5UY1B8zRQqfUg5Tn/view?usp=sharing)<br />
+[Download Installer from Google Drive](https://drive.google.com/file/d/1swYgX1vEJSvoGQ6vY7RhHijOUuf8WVlN/view?usp=sharing)<br />
 
 *__Note__: Portable version may require .NET6 desktop runtime: https://dotnet.microsoft.com/en-us/download/dotnet/6.0*
-
+*__Another Note__: Versions below .NET 6.0.5 had a bug with displaying tooltips. Be sure that you are using an updated version of .NET if you find this bug.*
 You can also join my Discord server to stay up to date with the latest updates and news about my current developments and projects: [Commando Squad](https://discord.gg/egcZRKgj4q)
 
 ## Table of Contents
@@ -72,15 +72,6 @@ The updated version includes all functions that were in AoE3Ed Viewer, as well a
 **Other:**
 * Comparison of BAR archives.
 * Create BAR archive from files and folders.
-
-## Latest Changes
-
-### Version 0.4.8
-* Added BAR structure caching and versioning combined with fast hash algorithm.
-* Added a link to the Google form for leaving feedback. 
-* Accelerated opening of BAR files and checking for updates by using a faster hash algorithm. 
-* Fixed freezes when extracting files from the list.
-* Fixed incorrect behavior when comparing BAR files.
 
 ## Screenshots
 
