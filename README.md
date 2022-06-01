@@ -17,10 +17,10 @@
 *Utility for viewing, comparing, creating and extracting files from Age of Empires III .BAR archive*
 
 **Developer:** VladTheJunior and Kevsoft<br />
-**Current version:** 0.4.9<br />
+**Current version:** 0.5.0<br />
 
 [Download Portable](https://github.com/VladTheJunior/Resource-Manager/releases/latest/download/ResourceManager.zip)<br />
-[Download Installer from Google Drive](https://drive.google.com/file/d/1swYgX1vEJSvoGQ6vY7RhHijOUuf8WVlN/view?usp=sharing)<br />
+[Download Installer from Google Drive](https://drive.google.com/file/d/1U7943hyNaG3yTmDMHn3XDndf_hkhV5Ee/view?usp=sharing)<br />
 
 *__Note__: Portable version may require .NET6 desktop runtime: https://dotnet.microsoft.com/en-us/download/dotnet/6.0*
 *__Another Note__: Versions below .NET 6.0.5 had a bug with displaying tooltips. Be sure that you are using an updated version of .NET if you find this bug.*
