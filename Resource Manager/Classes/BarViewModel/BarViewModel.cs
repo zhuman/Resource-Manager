@@ -250,9 +250,26 @@ namespace Archive_Unpacker.Classes.BarViewModel
                 {
 
                     using var memory = new MemoryStream(data);
-                    Bitmap img = new Bitmap(memory);
+                    
+                    var reader = new BinaryReader(memory);
+                    var png_header = reader.ReadInt32();
+                    memory.Position = 0;
+                    if (png_header == 0x474E5089)
+                    {
 
+                    
+                    var bitmap = new BitmapImage();
 
+                    using (var stream = new MemoryStream(data))
+                    {
+
+                            bitmap.BeginInit();
+                            bitmap.StreamSource = stream;
+                            bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                            bitmap.EndInit();
+                            bitmap.Freeze();
+                    }
+                    Bitmap img = BitmapImage2Bitmap(bitmap);
 
                     // Color Overlay
                     if (SavePNGasBMP && img.PixelFormat == System.Drawing.Imaging.PixelFormat.Format32bppArgb)
@@ -298,7 +315,7 @@ namespace Archive_Unpacker.Classes.BarViewModel
                     // Convert to WEBP
                     if (ConvertWEBP)
                     {
-
+                        //Debug.Write(img.PixelFormat);
                         using (WebP webp = new WebP())
                         {
                             byte[] webpData = webp.EncodeLossy(img, 75);
@@ -341,7 +358,17 @@ namespace Archive_Unpacker.Classes.BarViewModel
                     {
                         img.Save(ExtractPath, System.Drawing.Imaging.ImageFormat.Png);
                     }
-
+                    }
+                    else if (png_header == 0x33535452)
+                    {
+                        var ddt = new Ddt();
+                        await ddt.Create(data);
+                        await ddt.SaveAsPNG(ExtractPath);
+                    }
+                    else
+                    {
+                        await File.WriteAllBytesAsync(ExtractPath, data);
+                    }
 
                     CurrentProgress += (double)file.FileSize2 / filesSize;
                     continue;
@@ -440,7 +467,20 @@ namespace Archive_Unpacker.Classes.BarViewModel
         }
 
 
+        private Bitmap BitmapImage2Bitmap(BitmapImage bitmapImage)
+        {
+            // BitmapImage bitmapImage = new BitmapImage(new Uri("../Images/test.png", UriKind.Relative));
 
+            using (MemoryStream outStream = new MemoryStream())
+            {
+                BitmapEncoder enc = new BmpBitmapEncoder();
+                enc.Frames.Add(BitmapFrame.Create(bitmapImage));
+                enc.Save(outStream);
+                System.Drawing.Bitmap bitmap = new System.Drawing.Bitmap(outStream);
+
+                return new Bitmap(bitmap);
+            }
+        }
 
         public async Task readFile(BarEntry file)
         {
@@ -511,10 +551,25 @@ namespace Archive_Unpacker.Classes.BarViewModel
                     if (L33TZipUtils.IsL33TZipFile(data))
                         data = await L33TZipUtils.ExtractL33TZippedBytesAsync(data);
                 }
+
                 var bitmap = new BitmapImage();
 
                 using (var stream = new MemoryStream(data))
                 {
+                    var reader = new BinaryReader(stream);
+                    var png_header = reader.ReadInt32();
+                    stream.Position = 0;
+
+                    if (png_header == 0x33535452)
+                    {
+                        var ddt = new Ddt();
+                        await ddt.Create(data);
+                        bitmap = ddt.Bitmap;
+                    }
+                    else
+                    {
+
+                    
                     if (file.Extension == ".TGA")
                     {
              
@@ -535,7 +590,7 @@ namespace Archive_Unpacker.Classes.BarViewModel
                         bitmap.EndInit();
                         bitmap.Freeze();
                     }
-
+                    }
                 }
 
 

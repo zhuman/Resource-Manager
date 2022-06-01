@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Resource Manager"
-#define MyAppVersion "0.4.9"
+#define MyAppVersion "0.5.0"
 #define MyAppPublisher "VladTheJunior"
 #define MyAppExeName "ResourceManagerUpdater.exe"
 #define MyAppMainExeName "Resource Manager.exe"
@@ -98,8 +98,8 @@ Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
 
 [Run]
-Filename: "{tmp}\windowsdesktop-runtime-6.0.5-win-x86.exe"; Flags: runascurrentuser skipifdoesntexist; Check: (not IsWin64) and NotIsNetCoreInstalled86('Microsoft.NETCore.App 6.0.5')
-Filename: "{tmp}\windowsdesktop-runtime-6.0.5-win-x64.exe"; Flags: runascurrentuser skipifdoesntexist; Check: IsWin64 and NotIsNetCoreInstalled64('Microsoft.NETCore.App 6.0.5')
+Filename: "{tmp}\windowsdesktop-runtime-6.0.5-win-x86.exe"; Flags: runascurrentuser skipifdoesntexist; Check: (not IsWin64) and NotIsNetCoreInstalled86('Microsoft.WindowsDesktop.App 6.0.5')
+Filename: "{tmp}\windowsdesktop-runtime-6.0.5-win-x64.exe"; Flags: runascurrentuser skipifdoesntexist; Check: IsWin64 and NotIsNetCoreInstalled64('Microsoft.WindowsDesktop.App 6.0.5')
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: runascurrentuser nowait postinstall skipifsilent
 
 [Code]

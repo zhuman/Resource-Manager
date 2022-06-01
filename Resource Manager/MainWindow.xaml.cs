@@ -110,7 +110,7 @@ namespace Resource_Manager
         private GridViewColumnHeader listViewSortCol = null;
         private SortAdorner listViewSortAdorner = null;
         #endregion
-        int Version = 49;
+        int Version = 50;
         public MainWindow()
         {
             InitializeComponent();

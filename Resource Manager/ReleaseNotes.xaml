@@ -46,8 +46,8 @@
                 <Run FontSize="22" Text="Release Notes" />
 </Hyperlink>
                 <LineBreak />
-                <Run FontSize="16"  Text="May 20, 2022"  />
-                <Run FontSize="14" Text="version: 0.4.9" TextDecorations="Underline"/>
+                <Run FontSize="16"  Text="June 1, 2022"  />
+                <Run FontSize="14" Text="version: 0.5.0" TextDecorations="Underline"/>
             </TextBlock>
             <TextBlock
                 Grid.Row="1"
@@ -57,14 +57,11 @@
                 Grid.ColumnSpan="2" >
                 <LineBreak />
                 <Run FontWeight="Bold" Text=" − " />
-                <Run Text="Fixed a bug with the conversion of TGA to DDT." />
+                <Run Text="Fixed a bug with the conversion of some PNG to WEBP." />
                 <LineBreak />
                 <Run FontWeight="Bold" Text=" − " />
-                <Run Text="Fixed a bug with previewing TGA files." />   
+                <Run Text="Fixed a bug with previewing some PNG files." />   
                 <LineBreak />
-                <Run FontWeight="Bold" Text=" − " />
-                <Run Text="Fixed a bug reading some DDT files." />   
-                              
 
             </TextBlock>
 

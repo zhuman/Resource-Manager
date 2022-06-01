@@ -107,7 +107,7 @@ namespace ResourceManagerUpdater
         {
             get
             {
-                return "0.4.9";
+                return "0.5.0";
             }
         } 
         public string AvailableVersionUrl
@@ -262,7 +262,7 @@ namespace ResourceManagerUpdater
             int index = 1;
             var updateFiles = Directory.GetFiles(AppContext.BaseDirectory, "*.*", SearchOption.AllDirectories).Where(path => !path.Contains(".git")
                     && Path.GetFileName(path) != "UpdateCounter.txt" && Path.GetFileName(path) != "Updates.json" && !path.Contains("Cached")
-                    && Path.GetFileName(path) != ".gitignore" && Path.GetFileName(Path.GetDirectoryName(path)) != "Output");
+                    && Path.GetFileName(path) != ".gitignore" && Path.GetFileName(path) != ".gitattributes" && Path.GetFileName(Path.GetDirectoryName(path)) != "Output");
             foreach (string path in updateFiles)
             {
                 Progress = (double)index / (double)updateFiles.Count();
