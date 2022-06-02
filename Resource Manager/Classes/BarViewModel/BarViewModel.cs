@@ -6,7 +6,12 @@ using Resource_Manager.Classes.L33TZip;
 using Resource_Manager.Classes.sound;
 using Resource_Manager.Classes.Xmb;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Advanced;
+using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.Formats.Tga;
+using SixLabors.ImageSharp.Formats.Webp;
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Processing.Processors.Quantization;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -19,12 +24,14 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Xml;
 using WebPWrapper;
 using Color = System.Drawing.Color;
+using Image = SixLabors.ImageSharp.Image;
 using PixelFormat = System.Drawing.Imaging.PixelFormat;
 using Point = System.Drawing.Point;
 using Rectangle = System.Drawing.Rectangle;
@@ -165,7 +172,7 @@ namespace Archive_Unpacker.Classes.BarViewModel
                 return;
             }
             if (!string.IsNullOrEmpty(FilterText))
-            { 
+            {
                 var entry = e.Item as BarEntry;
                 if (IsLatestChangesVisible)
                     e.Accepted = entry.FileNameWithRoot.ToLower().Contains(FilterText.ToLower()) && entry.IsLatestChange;
@@ -250,114 +257,112 @@ namespace Archive_Unpacker.Classes.BarViewModel
                 {
 
                     using var memory = new MemoryStream(data);
-                    
+
                     var reader = new BinaryReader(memory);
                     var png_header = reader.ReadInt32();
                     memory.Position = 0;
                     if (png_header == 0x474E5089)
                     {
+                        using Image image = await Image.LoadAsync(memory);
+                        PngEncoder encoder = new PngEncoder();
+                        encoder.ColorType = PngColorType.RgbWithAlpha;
 
-                    
-                    var bitmap = new BitmapImage();
+                        using var stream = new MemoryStream();
+                        await image.SaveAsync(stream, encoder);
+                        Bitmap img = new Bitmap(stream);
 
-                    using (var stream = new MemoryStream(data))
-                    {
 
-                            bitmap.BeginInit();
-                            bitmap.StreamSource = stream;
-                            bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                            bitmap.EndInit();
-                            bitmap.Freeze();
-                    }
-                    Bitmap img = BitmapImage2Bitmap(bitmap);
 
-                    // Color Overlay
-                    if (SavePNGasBMP && img.PixelFormat == System.Drawing.Imaging.PixelFormat.Format32bppArgb)
-                    {
-                        PixelFormat fmt1 = img.PixelFormat;
-                        
-                        byte bpp1 = 4;
 
-                        Rectangle rect = new Rectangle(Point.Empty, new Size(img.Width, img.Height));
-                        BitmapData bmpData = img.LockBits(rect, ImageLockMode.ReadWrite, fmt1);
 
-                        int size1 = bmpData.Stride * bmpData.Height;
-                        byte[] pixels = new byte[size1];
-                        Marshal.Copy(bmpData.Scan0, pixels, 0, size1);
-
-                        for (int y = 0; y < img.Height; y++)
+                        // Color Overlay
+                        if (SavePNGasBMP && img.PixelFormat == System.Drawing.Imaging.PixelFormat.Format32bppArgb)
                         {
-                            for (int x = 0; x < img.Width; x++)
-                            {
-                                int index = y * bmpData.Stride + x * bpp1;
-                                var alpha = pixels[index + 3];
-                                if (alpha < 255)
-                                {
+                            PixelFormat fmt1 = img.PixelFormat;
 
-                                    pixels[index] = (byte)(pixels[index] * OverlayColor.B / 255);  //b
-                                    pixels[index + 1] = (byte)(pixels[index + 1] * OverlayColor.G / 255); //g
-                                    pixels[index + 2] = (byte)(pixels[index + 2] * OverlayColor.R / 255); //r
-                                    pixels[index + 3] = 255;
+                            byte bpp1 = 4;
+
+                            Rectangle rect = new Rectangle(Point.Empty, new Size(img.Width, img.Height));
+                            BitmapData bmpData = img.LockBits(rect, ImageLockMode.ReadWrite, fmt1);
+
+                            int size1 = bmpData.Stride * bmpData.Height;
+                            byte[] pixels = new byte[size1];
+                            Marshal.Copy(bmpData.Scan0, pixels, 0, size1);
+
+                            for (int y = 0; y < img.Height; y++)
+                            {
+                                for (int x = 0; x < img.Width; x++)
+                                {
+                                    int index = y * bmpData.Stride + x * bpp1;
+                                    var alpha = pixels[index + 3];
+                                    if (alpha < 255)
+                                    {
+
+                                        pixels[index] = (byte)(pixels[index] * OverlayColor.B / 255);  //b
+                                        pixels[index + 1] = (byte)(pixels[index + 1] * OverlayColor.G / 255); //g
+                                        pixels[index + 2] = (byte)(pixels[index + 2] * OverlayColor.R / 255); //r
+                                        pixels[index + 3] = 255;
+                                    }
+
                                 }
+                            }
+
+                            Marshal.Copy(pixels, 0, bmpData.Scan0, pixels.Length);
+                            img.UnlockBits(bmpData);
+                            using (Graphics g = Graphics.FromImage(img))
+                            {
+                                g.DrawImage(new Bitmap(stream), Point.Empty);
 
                             }
                         }
+                        memory.Position = 0;
+                        // Convert to WEBP
+                        if (ConvertWEBP)
+                        {
 
-                        Marshal.Copy(pixels, 0, bmpData.Scan0, pixels.Length);
-                        img.UnlockBits(bmpData);
-                        using (Graphics g = Graphics.FromImage(img))
-                        {
-                            g.DrawImage(new Bitmap(memory), Point.Empty);
-
-                        }
-                    }
-
-                    // Convert to WEBP
-                    if (ConvertWEBP)
-                    {
-                        //Debug.Write(img.PixelFormat);
-                        using (WebP webp = new WebP())
-                        {
-                            byte[] webpData = webp.EncodeLossy(img, 75);
-                            await File.WriteAllBytesAsync(Path.ChangeExtension(ExtractPath, "webp"), webpData);
-                        }
-                            
-                    }
-                    
-                    // Compressing
-                    if (CompressPNG)
-                    {
-                        ImageConverter converter = new ImageConverter();
-                        byte[] uncompressed = (byte[])converter.ConvertTo(img, typeof(byte[]));
-                        ProcessStartInfo info = new ProcessStartInfo()
-                        {
-                            CreateNoWindow = true,
-                            FileName = Path.Combine(Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName), "pngquant.exe"),
-                            Arguments = "--quality=45-85 -",
-                            RedirectStandardInput = true,
-                            RedirectStandardOutput = true,
-                            UseShellExecute = false,
-                        };
-                        Process pro = Process.Start(info);
-                        using (MemoryStream outputStream = new MemoryStream())
-                        {
-                            await pro.StandardInput.BaseStream.WriteAsync(uncompressed, 0, uncompressed.Length);
-                            await pro.StandardInput.BaseStream.FlushAsync();
-                            await pro.StandardOutput.BaseStream.CopyToAsync(outputStream);
-                            byte[] output = outputStream.ToArray();
-                            await File.WriteAllBytesAsync(ExtractPath, output);
+                            using (WebP webp = new WebP())
+                            {
+                                byte[] webpData = webp.EncodeLossy(img, 75);
+                                await File.WriteAllBytesAsync(Path.ChangeExtension(ExtractPath, "webp"), webpData);
+                            }
 
                         }
-                       // var quantizer = new PnnQuant.PnnQuantizer();
-                       // using (var dest = quantizer.QuantizeImage(img, System.Drawing.Imaging.PixelFormat.Undefined, 256, true))
-                        //{
-                      //      dest.Save(ExtractPath, System.Drawing.Imaging.ImageFormat.Png);
-                      //  }
-                    }
-                    else
-                    {
-                        img.Save(ExtractPath, System.Drawing.Imaging.ImageFormat.Png);
-                    }
+
+                        // Compressing
+                        if (CompressPNG)
+                        {
+
+                            ImageConverter converter = new ImageConverter();
+                            byte[] uncompressed = (byte[])converter.ConvertTo(img, typeof(byte[]));
+                            ProcessStartInfo info = new ProcessStartInfo()
+                            {
+                                CreateNoWindow = true,
+                                FileName = Path.Combine(Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName), "pngquant.exe"),
+                                Arguments = "--quality=45-85 -",
+                                RedirectStandardInput = true,
+                                RedirectStandardOutput = true,
+                                UseShellExecute = false,
+                            };
+                            Process pro = Process.Start(info);
+                            using (MemoryStream outputStream = new MemoryStream())
+                            {
+                                await pro.StandardInput.BaseStream.WriteAsync(uncompressed, 0, uncompressed.Length);
+                                await pro.StandardInput.BaseStream.FlushAsync();
+                                await pro.StandardOutput.BaseStream.CopyToAsync(outputStream);
+                                byte[] output = outputStream.ToArray();
+                                await File.WriteAllBytesAsync(ExtractPath, output);
+
+                            }
+                            // var quantizer = new PnnQuant.PnnQuantizer();
+                            // using (var dest = quantizer.QuantizeImage(img, System.Drawing.Imaging.PixelFormat.Undefined, 256, true))
+                            //{
+                            //      dest.Save(ExtractPath, System.Drawing.Imaging.ImageFormat.Png);
+                            //  }
+                        }
+                        else
+                        {
+                            img.Save(ExtractPath, System.Drawing.Imaging.ImageFormat.Png);
+                        }
                     }
                     else if (png_header == 0x33535452)
                     {
@@ -466,22 +471,6 @@ namespace Archive_Unpacker.Classes.BarViewModel
 
         }
 
-
-        private Bitmap BitmapImage2Bitmap(BitmapImage bitmapImage)
-        {
-            // BitmapImage bitmapImage = new BitmapImage(new Uri("../Images/test.png", UriKind.Relative));
-
-            using (MemoryStream outStream = new MemoryStream())
-            {
-                BitmapEncoder enc = new BmpBitmapEncoder();
-                enc.Frames.Add(BitmapFrame.Create(bitmapImage));
-                enc.Save(outStream);
-                System.Drawing.Bitmap bitmap = new System.Drawing.Bitmap(outStream);
-
-                return new Bitmap(bitmap);
-            }
-        }
-
         public async Task readFile(BarEntry file)
         {
 
@@ -569,27 +558,27 @@ namespace Archive_Unpacker.Classes.BarViewModel
                     else
                     {
 
-                    
-                    if (file.Extension == ".TGA")
-                    {
-             
-                        var image = await SixLabors.ImageSharp.Image.LoadAsync(stream);
 
-                    using MemoryStream memory = new MemoryStream();
-                        await image.SaveAsBmpAsync(memory);
-                        bitmap.BeginInit();
-                        bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                        bitmap.StreamSource = memory;
-                        bitmap.EndInit();
-                    }
-                    else
-                    {
-                        bitmap.BeginInit();
-                        bitmap.StreamSource = stream;
-                        bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                        bitmap.EndInit();
-                        bitmap.Freeze();
-                    }
+                        if (file.Extension == ".TGA")
+                        {
+
+                            var image = await SixLabors.ImageSharp.Image.LoadAsync(stream);
+
+                            using MemoryStream memory = new MemoryStream();
+                            await image.SaveAsBmpAsync(memory);
+                            bitmap.BeginInit();
+                            bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                            bitmap.StreamSource = memory;
+                            bitmap.EndInit();
+                        }
+                        else
+                        {
+                            bitmap.BeginInit();
+                            bitmap.StreamSource = stream;
+                            bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                            bitmap.EndInit();
+                            bitmap.Freeze();
+                        }
                     }
                 }
 
@@ -654,7 +643,7 @@ namespace Archive_Unpacker.Classes.BarViewModel
             return;
         }
 
-      
+
         public async static Task<BarViewModel> Load(string filename)
         {
             BarViewModel barViewModel = new BarViewModel();
