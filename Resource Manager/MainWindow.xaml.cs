@@ -22,6 +22,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -36,7 +37,6 @@ using System.Xml;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 using MessageBox = System.Windows.MessageBox;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
-
 public class RecentFile
 {
     public string Title { get; set; }
@@ -113,6 +113,8 @@ namespace Resource_Manager
         int Version = 50;
         public MainWindow()
         {
+          
+
             InitializeComponent();
             SearchPanel.Install(XMLViewer);
             DataContext = this;
@@ -405,17 +407,16 @@ namespace Resource_Manager
             }
             if (header.Tag.ToString() == "FileNameWithRoot")
             {
-
-
-                if (file.barFile.barFileHeader.Version > 5)
+                if (file == null || file.barFile.barFileHeader.Version <=5)
+                {
+                    minWidth = 250;
+                }
+                else
                 {
                     minWidth = 440;
 
                 }
-                else
-                {
-                    minWidth = 250;
-                }
+
             }
             if (header.Tag.ToString() == "FileSize2")
             {
@@ -427,16 +428,18 @@ namespace Resource_Manager
             }
             if (header.Tag.ToString() == "lastModifiedDate")
             {
-                if (file.barFile.barFileHeader.Version > 5)
+
+                if (file == null || file.barFile.barFileHeader.Version <= 5)
+                {
+                    minWidth = 190;
+                }
+                else
                 {
                     e.Handled = true;
                     header.Column.Width = 0;
 
                 }
-                else
-                {
-                    minWidth = 190;
-                }
+
             }
             if (header.Column.ActualWidth < minWidth)
             {
