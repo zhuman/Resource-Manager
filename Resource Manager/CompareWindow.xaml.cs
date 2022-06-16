@@ -108,27 +108,26 @@ namespace Resource_Manager
             if (header.Tag.ToString() == "entryOld.FileNameWithRoot")
             {
 
-                if (Bar1.barFile.barFileHeader.Version > 5)
+                if (Bar1 == null || Bar1.barFile.barFileHeader.Version <= 5)
                 {
-                    minWidth = 345;
-
+                    minWidth = 185;
                 }
                 else
                 {
-                    minWidth = 185;
+                    minWidth = 345;
+
                 }
             }
             if (header.Tag.ToString() == "entryNew.FileNameWithRoot")
             {
-
-                if (Bar2.barFile.barFileHeader.Version > 5)
+                if (Bar2 == null || Bar2.barFile.barFileHeader.Version <= 5)
                 {
-                    minWidth = 345;
-
+                    minWidth = 185;
                 }
                 else
                 {
-                    minWidth = 185;
+                    minWidth = 345;
+
                 }
             }
 
@@ -142,27 +141,30 @@ namespace Resource_Manager
             }
             if (header.Tag.ToString() == "entryOld.lastModifiedDate")
             {
-                if (Bar1.barFile.barFileHeader.Version > 5)
+
+                if (Bar1 == null || Bar1.barFile.barFileHeader.Version <= 5)
+                {
+                    minWidth = 160;
+                }
+                else
                 {
                     minWidth = 0;
 
                 }
-                else
-                {
-                    minWidth = 160;
-                }
+               
             }
             if (header.Tag.ToString() == "entryNew.lastModifiedDate")
             {
-                if (Bar2.barFile.barFileHeader.Version > 5)
+                if (Bar2 == null || Bar2.barFile.barFileHeader.Version <= 5)
+                {
+                    minWidth = 160;
+                }
+                else
                 {
                     minWidth = 0;
 
                 }
-                else
-                {
-                    minWidth = 160;
-                }
+
             }
             if (header.Column.ActualWidth < minWidth)
             {
