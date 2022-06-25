@@ -37,10 +37,10 @@ namespace Resource_Manager.Classes.BarComparer
             {
                 var Added = bar2.barFile.BarFileEntrys.Where(item => !bar1.barFile.BarFileEntrys.Any(item2 => item2.FileNameWithRoot.ToLower() == item.FileNameWithRoot.ToLower())).ToList();
                 var Removed = bar1.barFile.BarFileEntrys.Where(item => !bar2.barFile.BarFileEntrys.Any(item2 => item2.FileNameWithRoot.ToLower() == item.FileNameWithRoot.ToLower())).ToList();             
-                var ChangedOld = bar1.barFile.BarFileEntrys.Where(item => bar2.barFile.BarFileEntrys.Any(item2 => item2.FileNameWithRoot.ToLower() == item.FileNameWithRoot.ToLower() && item2.Hash != item.Hash)).ToList();
-                var ChangedNew = bar2.barFile.BarFileEntrys.Where(item => bar1.barFile.BarFileEntrys.Any(item2 => item2.FileNameWithRoot.ToLower() == item.FileNameWithRoot.ToLower() && item2.Hash != item.Hash)).ToList();
-                var SameOld = bar1.barFile.BarFileEntrys.Where(item => bar2.barFile.BarFileEntrys.Any(item2 => item2.FileNameWithRoot.ToLower() == item.FileNameWithRoot.ToLower() && item2.Hash == item.Hash)).ToList();
-                var SameNew = bar2.barFile.BarFileEntrys.Where(item => bar1.barFile.BarFileEntrys.Any(item2 => item2.FileNameWithRoot.ToLower() == item.FileNameWithRoot.ToLower() && item2.Hash == item.Hash)).ToList();
+                var ChangedOld = bar1.barFile.BarFileEntrys.Where(item => bar2.barFile.BarFileEntrys.Any(item2 => item2.FileNameWithRoot.ToLower() == item.FileNameWithRoot.ToLower() && item2.Hash != item.Hash)).OrderBy(x=>x.FileNameWithRoot).ToList();
+                var ChangedNew = bar2.barFile.BarFileEntrys.Where(item => bar1.barFile.BarFileEntrys.Any(item2 => item2.FileNameWithRoot.ToLower() == item.FileNameWithRoot.ToLower() && item2.Hash != item.Hash)).OrderBy(x => x.FileNameWithRoot).ToList();
+                var SameOld = bar1.barFile.BarFileEntrys.Where(item => bar2.barFile.BarFileEntrys.Any(item2 => item2.FileNameWithRoot.ToLower() == item.FileNameWithRoot.ToLower() && item2.Hash == item.Hash)).OrderBy(x => x.FileNameWithRoot).ToList();
+                var SameNew = bar2.barFile.BarFileEntrys.Where(item => bar1.barFile.BarFileEntrys.Any(item2 => item2.FileNameWithRoot.ToLower() == item.FileNameWithRoot.ToLower() && item2.Hash == item.Hash)).OrderBy(x => x.FileNameWithRoot).ToList();
 
 
                 for (int i = 0; i < ChangedOld.Count; i++)
