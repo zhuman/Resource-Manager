@@ -16,6 +16,8 @@ namespace Resource_Manager
 
         public string RootPath { get; set; } = "";
 
+        public string BarFileName { get; set; } = "";
+
         public uint Version
         {
             get
@@ -39,11 +41,19 @@ namespace Resource_Manager
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrEmpty(RootPath))
-                MessageBox.Show("Select Bar Root Folder!");
-            else
             {
-                DialogResult = true;
+                MessageBox.Show("Select Bar Root Folder!");
+                return;
             }
+            if (string.IsNullOrEmpty(tbBarName.Text))
+            {
+                MessageBox.Show("Enter Bar File Name!");
+                return;
+            }
+            BarFileName = tbBarName.Text;
+
+                DialogResult = true;
+            
         }
     }
 }

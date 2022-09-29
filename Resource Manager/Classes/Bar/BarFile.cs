@@ -103,7 +103,7 @@ namespace Resource_Manager.Classes.Bar
             return barFile;
         }
 
-        public static async Task<BarFile> Create(string root, uint version)
+        public static async Task<BarFile> Create(string root, uint version, string filename)
         {
             BarFile barFile = new BarFile();
 
@@ -114,17 +114,17 @@ namespace Resource_Manager.Classes.Bar
                         .Select(fileName => new FileInfo(fileName)).ToArray();
 
 
+            //Directory.GetParent(root);
+            //if (root.EndsWith(Path.DirectorySeparatorChar.ToString()))
+            //    root = root[0..^1];
 
-            if (root.EndsWith(Path.DirectorySeparatorChar.ToString()))
-                root = root[0..^1];
 
-
-            using (var fileStream = File.Open(root + ".bar", FileMode.Create, FileAccess.Write, FileShare.None))
+            using (var fileStream = File.Open(Path.Combine(Directory.GetParent(root).FullName, filename + ".bar"), FileMode.Create, FileAccess.Write, FileShare.None))
             {
                 using (var writer = new BinaryWriter(fileStream))
                 {
                     //Write Bar Header
-                    var header = new BarFileHeader(fileInfos, version);
+                    var header = new BarFileHeader(fileInfos, version, filename + ".bar");
                     writer.Write(header.ToByteArray());
 
                     if (version > 3)

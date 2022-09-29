@@ -659,16 +659,12 @@ namespace Archive_Unpacker.Classes.BarViewModel
             return barViewModel;
         }
 
-        public static async Task<BarViewModel> Create(string rootFolder, uint version)
+        public static async Task<BarViewModel> Create(string rootFolder, uint version, string filename)
         {
             BarViewModel barViewModel = new BarViewModel();
             barViewModel.extractingState = 0;
-
-            var filename = rootFolder;
-            if (rootFolder.EndsWith(Path.DirectorySeparatorChar.ToString()))
-                filename = rootFolder.Substring(0, rootFolder.Length - 1);
-            barViewModel.barFilePath = filename + ".bar";
-            barViewModel.barFile = await BarFile.Create(rootFolder, version);
+            barViewModel.barFilePath = Path.Combine(Directory.GetParent(rootFolder).FullName, filename + ".bar");
+            barViewModel.barFile = await BarFile.Create(rootFolder, version, filename);
             barViewModel.entriesCollection = new CollectionViewSource();
             barViewModel.ResetProgress();
 

@@ -600,7 +600,7 @@ namespace Resource_Manager
                     file = null;
                     NotifyPropertyChanged("recentFiles");
                     NotifyPropertyChanged("file");
-                    file = await BarViewModel.Create(createBarFileDialog.RootPath, createBarFileDialog.Version);
+                    file = await BarViewModel.Create(createBarFileDialog.RootPath, createBarFileDialog.Version, createBarFileDialog.BarFileName);
                     if (Settings.Default.RecentFiles.Contains(file.barFilePath))
                     {
                         Settings.Default.RecentFiles.Remove(file.barFilePath);

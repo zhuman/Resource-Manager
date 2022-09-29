@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -10,6 +11,7 @@ using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -28,8 +30,8 @@ namespace ResourceManagerUpdater
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        private double progress;
-        public double Progress
+        private int progress;
+        public int Progress
         {
             get { return progress; }
             set
@@ -138,7 +140,9 @@ namespace ResourceManagerUpdater
 
         public Updates ServerUpdates { get; set; } = new Updates();
         public Updates ClientUpdates { get; set; } = new Updates();
-        public Queue<Update> NewUpdates { get; set; } = new Queue<Update>();
+        public ConcurrentQueue<Update> NewUpdates { get; set; } = new ConcurrentQueue<Update>();
+
+        private readonly HttpClient httpClient = new() { Timeout = TimeSpan.FromMinutes(60) };
 
         static async Task<string> CalculateMD5(string filename)
         {
@@ -147,68 +151,7 @@ namespace ResourceManagerUpdater
             return BitConverter.ToString(hash).Replace("-", string.Empty).ToLowerInvariant();
         }
 
-        private void DownloadFile(Queue<Update> urls)
-        {
-            if (urls.Any())
-            {
-                previousDownloaded = 0;
-                WebClient client = new WebClient();
-                client.DownloadProgressChanged += client_DownloadProgressChanged;
-                client.DownloadFileCompleted += client_DownloadFileCompleted;
-
-                var url = urls.Dequeue();
-                Directory.CreateDirectory(Path.GetDirectoryName(Path.Combine(AppContext.BaseDirectory, url.install_path)));
-                client.DownloadFileAsync(new Uri((url.url)), Path.Combine(AppContext.BaseDirectory, url.install_path));
-                UpdateName = url.name;
-
-
-                return;
-            }
-
-            using (var batFile = new StreamWriter(File.Create("Update.bat")))
-            {
-                string file = Path.GetFileName(Process.GetCurrentProcess().MainModule.FileName);
-                batFile.WriteLine("@ECHO OFF");
-                batFile.WriteLine("TIMEOUT /t 1 /nobreak > NUL");
-                batFile.WriteLine("TASKKILL /F /IM \"{0}\" > NUL", file);
-                batFile.WriteLine("IF EXIST \"{0}\" MOVE \"{0}\" \"{1}\"", file + ".upd", file);
-                batFile.WriteLine("IF EXIST \"{0}\" MOVE \"{0}\" \"{1}\"", Path.GetFileNameWithoutExtension(file) + ".dll.upd", Path.GetFileNameWithoutExtension(file) + ".dll");
-                batFile.WriteLine("DEL \"%~f0\" & START \"\" /B \"{0}\"", "Resource Manager.exe");
-            }
-            ProcessStartInfo startInfo = new ProcessStartInfo("Update.bat");
-            startInfo.CreateNoWindow = true;
-            startInfo.UseShellExecute = false;
-            startInfo.WorkingDirectory = AppContext.BaseDirectory;
-            Process.Start(startInfo);
-            Environment.Exit(0);
-        }
-
-        private void client_DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
-        {
-            if (e.Error != null)
-            {
-                // handle error scenario
-                throw e.Error;
-            }
-            if (e.Cancelled)
-            {
-                // handle cancelled scenario
-            }
-            DownloadFile(NewUpdates);
-        }
-
-        private long previousDownloaded = 0;
-
-        void client_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
-        {
-            
-            DownloadedSize += e.BytesReceived - previousDownloaded;
-            Progress = (double)DownloadedSize / (double)UpdatesSize;
-            ProgressText = "Downloading: " + FormatFileSize(DownloadedSize) + " of " + FormatFileSize(UpdatesSize);
-            previousDownloaded = e.BytesReceived;
-        }
-
-        async Task<string> HttpGetAsync(string URI)
+        private async Task<string> HttpGetAsync(string URI)
         {
             try
             {
@@ -227,10 +170,45 @@ namespace ResourceManagerUpdater
             }
         }
 
+        private async Task<bool> DownloadFile(Update update)
+        {
+            try
+            {
+
+
+                Directory.CreateDirectory(Path.GetDirectoryName(Path.Combine(AppContext.BaseDirectory, update.install_path)));
+
+                HttpResponseMessage response = await httpClient.GetAsync(update.url);
+                // Check that response was successful or throw exception
+                response.EnsureSuccessStatusCode();
+
+                // Read response asynchronously and save asynchronously to file
+                using (FileStream fileStream = new FileStream(Path.Combine(AppContext.BaseDirectory, update.install_path), FileMode.Create, FileAccess.Write, FileShare.None))
+                {
+                    //copy the content from response to filestream
+                    await response.Content.CopyToAsync(fileStream);
+
+
+                }
+
+                Interlocked.Increment(ref progress);
+                NotifyPropertyChanged("Progress");
+                ProgressText = $"Downloaded: file {progress} of {maximum}";
+                UpdateName = update.install_path;
+            }
+            catch
+            {
+
+            }
+            return true;
+
+         
+        }
+
         async Task<Updates> CheckUpdates()
         {
             string json = await HttpGetAsync("https://raw.githubusercontent.com/VladTheJunior/ResourceManagerUpdates/master/Updates.json");
-            Updates res = new Updates();
+            Updates res = new ();
             try
             {
                 res = JsonSerializer.Deserialize<Updates>(json);
@@ -243,41 +221,70 @@ namespace ResourceManagerUpdater
 
         public MainWindow()
         {
+            ServicePointManager.UseNagleAlgorithm = false;
+            ServicePointManager.Expect100Continue = false;
+            ServicePointManager.DefaultConnectionLimit = int.MaxValue;
+            ServicePointManager.EnableDnsRoundRobin = true;
+            ServicePointManager.ReusePort = true;
             InitializeComponent();
             DataContext = this;
         }
 
-        public static string FormatFileSize(long bytes)
-        {
-            var unit = 1024;
-            if (bytes < unit) { return $"{bytes} B"; }
+        private object CheckLock = new object();
 
-            var exp = (int)(Math.Log(bytes) / Math.Log(unit));
-            return $"{bytes / Math.Pow(unit, exp):F2} {("KMGTPE")[exp - 1]}B";
+        private int maximum = 0;
+
+        private async Task<bool> ScanFile(string path)
+        {
+            var hash = await CalculateMD5(path);
+            lock (CheckLock)
+            {
+                ClientUpdates.files.Add(new Update { name = Path.GetFileName(path), size = new FileInfo(path).Length, install_path = path.Remove(0, AppContext.BaseDirectory.Length), md5 = hash, url = new Uri(new Uri("https://raw.githubusercontent.com/VladTheJunior/ResourceManagerUpdates/master/"), path.Remove(0, AppContext.BaseDirectory.Length)).ToString() });
+            }
+            Interlocked.Increment(ref progress);
+            NotifyPropertyChanged("Progress");
+            ProgressText = $"Checked: file {progress} of {maximum}";
+            UpdateName = path.Remove(0, AppContext.BaseDirectory.Length);
+            return true;
         }
+
+
 
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            await Task.Delay(1);
             AvailableVersion = "checking...";
             int index = 1;
-            var updateFiles = Directory.GetFiles(AppContext.BaseDirectory, "*.*", SearchOption.AllDirectories).Where(path => !path.Contains(".git")
+            ConcurrentQueue<string> updateFiles = new(Directory.GetFiles(AppContext.BaseDirectory, "*.*", SearchOption.AllDirectories).Where(path => !path.Contains(".git")
                     && Path.GetFileName(path) != "UpdateCounter.txt" && Path.GetFileName(path) != "Updates.json" && !path.Contains("Cached")
-                    && Path.GetFileName(path) != ".gitignore" && Path.GetFileName(path) != ".gitattributes" && Path.GetFileName(Path.GetDirectoryName(path)) != "Output");
-            foreach (string path in updateFiles)
+                    && Path.GetFileName(path) != ".gitignore" && Path.GetFileName(path) != ".gitattributes" && Path.GetFileName(Path.GetDirectoryName(path)) != "Output"));
+
+            pbProgress.Maximum = updateFiles.Count();
+
+
+            maximum = updateFiles.Count();
+
+            var CheckTasks = new List<Task>();
+            for (int i = 0; i < 300; i++)
             {
-                Progress = (double)index / (double)updateFiles.Count();
-                ClientUpdates.files.Add(new Update { name = Path.GetFileName(path), size = new FileInfo(path).Length, install_path = path.Remove(0, AppContext.BaseDirectory.Length), md5 = await CalculateMD5(path), url = new Uri(new Uri("https://raw.githubusercontent.com/VladTheJunior/ResourceManagerUpdates/master/"), path.Remove(0, AppContext.BaseDirectory.Length)).ToString() });
-                ProgressText = $"Checking: file {index} of {updateFiles.Count()}";
-                UpdateName = Path.GetFileName(path);
-                index++;
+                CheckTasks.Add(Task.Run(async () =>
+                {
+                    while (updateFiles.TryDequeue(out string update))
+                    {
+                        await ScanFile(update);
+                    }
+                }
+                ));
             }
 
+            await Task.WhenAll(CheckTasks);
             ClientUpdates.version = CurrentVersion;
             ClientUpdates.url = AvailableVersionUrl;
-            await File.WriteAllTextAsync(Path.Combine(AppContext.BaseDirectory,"Updates.json"), JsonSerializer.Serialize(ClientUpdates));
+            await File.WriteAllTextAsync("Updates.json", JsonSerializer.Serialize(ClientUpdates));
 
-
+            /*    */
             ServerUpdates = await CheckUpdates();
+
             
             if (ServerUpdates.files.Count > 0)
             {
@@ -302,9 +309,41 @@ namespace ResourceManagerUpdater
                 AvailableVersion = "up-to-dated";
             }
             Progress = 0;
-            DownloadedSize = 0;
-            UpdatesSize = NewUpdates.Sum(x => x.size);
-            DownloadFile(NewUpdates);
+            pbProgress.Maximum = NewUpdates.Count;
+            maximum = NewUpdates.Count();
+
+            var UpdateTasks = new List<Task>();
+            for (int i = 0; i < 20; i++)
+            {
+                UpdateTasks.Add(Task.Run(async () =>
+                {
+                    while (NewUpdates.TryDequeue(out Update update))
+                    {
+                        await DownloadFile(update);
+                    }
+                }
+                ));
+            }
+
+            await Task.WhenAll(UpdateTasks);
+
+            using (var batFile = new StreamWriter(File.Create("Update.bat")))
+            {
+                string file = Path.GetFileName(Process.GetCurrentProcess().MainModule.FileName);
+                batFile.WriteLine("@ECHO OFF");
+                batFile.WriteLine("TIMEOUT /t 1 /nobreak > NUL");
+                batFile.WriteLine("TASKKILL /F /IM \"{0}\" > NUL", file);
+                batFile.WriteLine("IF EXIST \"{0}\" MOVE \"{0}\" \"{1}\"", file + ".upd", file);
+                batFile.WriteLine("IF EXIST \"{0}\" MOVE \"{0}\" \"{1}\"", Path.GetFileNameWithoutExtension(file) + ".dll.upd", Path.GetFileNameWithoutExtension(file) + ".dll");
+                batFile.WriteLine("DEL \"%~f0\" & START \"\" /B \"{0}\"", "Resource Manager.exe");
+            }
+            ProcessStartInfo startInfo = new ProcessStartInfo("Update.bat");
+            startInfo.CreateNoWindow = true;
+            startInfo.UseShellExecute = false;
+            startInfo.WorkingDirectory = AppContext.BaseDirectory;
+            Process.Start(startInfo);
+            Environment.Exit(0);
+
         }
     }
 }

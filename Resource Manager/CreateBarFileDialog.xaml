@@ -18,6 +18,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto" />
             <RowDefinition Height="auto"/>
             
 
@@ -29,8 +30,21 @@
         </ComboBox>
         <TextBlock Grid.Row="1" Grid.Column="0" Text="Bar Root Folder: " HorizontalAlignment="Left" VerticalAlignment="Center"/>
         <TextBox VerticalContentAlignment="Center" FontSize="14" x:Name="tbRootPath" IsReadOnly="True" Margin="5,5" Grid.Row="1" Width="250" Grid.Column="1"/>
+        <TextBlock Grid.Row="2"
+                   Grid.Column="0"
+                   Text="Bar File Name (without extension): "
+                   HorizontalAlignment="Left"
+                   VerticalAlignment="Center" />
+        <TextBox VerticalContentAlignment="Center"
+                 FontSize="14"
+                 x:Name="tbBarName"
+                 Margin="5,5"
+                 Grid.Row="2"
+                 Width="250"
+                 Grid.Column="1"
+                 Height="22.4" />
         <Button Margin="5,5,0,5" Grid.Row="1" HorizontalAlignment="Center" Width="100" Grid.Column="2" Content="Browse..." Click="Button_Click"/>
-        <Button Margin="0,5" Content="Create" Grid.Row="2" Grid.ColumnSpan="3" HorizontalAlignment="Center" Width="100" Padding="0,3,0,0" Click="Button_Click_1"/>
+        <Button Margin="0,5" Content="Create" Grid.Row="3" Grid.ColumnSpan="3" HorizontalAlignment="Center" Width="100" Padding="0,3,0,0" Click="Button_Click_1"/>
     </Grid>
 
 </Window>

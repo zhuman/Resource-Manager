@@ -73,10 +73,11 @@
             FontSize="14"
             Text="{Binding UpdateName}"
             TextDecorations="{x:Null}" />
-        <ProgressBar
-            Grid.Row="3"
+        <ProgressBar x:Name="pbProgress"
+                     Grid.Row="3"
             Width="520"
             Height="32"
+            
             Maximum="1"
             Value="{Binding Progress}" />
     </Grid>
