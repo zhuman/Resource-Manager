@@ -19,7 +19,7 @@
 **Developer:** VladTheJunior and Kevsoft<br />
 **Current version:** 0.5.0<br />
 
-[Download Portable (.ZIP archive)](https://github.com/VladTheJunior/RecourceManagerUpdates/archive/refs/heads/master.zip)<br />
+[Download Portable (.ZIP archive)](https://github.com/VladTheJunior/ResourceManagerUpdates/archive/refs/heads/master.zip)<br />
 [Download Installer from Google Drive](https://drive.google.com/file/d/1U7943hyNaG3yTmDMHn3XDndf_hkhV5Ee/view?usp=sharing)<br />
 
 *__Note__: Portable version may require .NET6 desktop runtime: https://dotnet.microsoft.com/en-us/download/dotnet/6.0*
