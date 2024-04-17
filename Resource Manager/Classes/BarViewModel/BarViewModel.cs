@@ -264,8 +264,10 @@ namespace Archive_Unpacker.Classes.BarViewModel
                     if (png_header == 0x474E5089)
                     {
                         using Image image = await Image.LoadAsync(memory);
-                        PngEncoder encoder = new PngEncoder();
-                        encoder.ColorType = PngColorType.RgbWithAlpha;
+                        PngEncoder encoder = new()
+                        {
+                            ColorType = PngColorType.RgbWithAlpha
+                        };
 
                         using var stream = new MemoryStream();
                         await image.SaveAsync(stream, encoder);

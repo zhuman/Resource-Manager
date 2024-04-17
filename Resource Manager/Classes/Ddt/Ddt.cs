@@ -246,8 +246,10 @@ namespace Resource_Manager.Classes.Ddt
 
         public async Task SaveAsTGA(string dest)
         {
-            TgaEncoder tga = new TgaEncoder();
-            tga.BitsPerPixel = TgaBitsPerPixel.Pixel32;
+            TgaEncoder tga = new()
+            {
+                BitsPerPixel = TgaBitsPerPixel.Pixel32
+            };
             var file_name = Path.GetFileNameWithoutExtension(dest);
             file_name = file_name + ".(" + ((byte)Usage).ToString() + "," + ((byte)Alpha).ToString() + "," + ((byte)Format).ToString() + "," + ((byte)MipmapLevels).ToString() + ").tga";
             await mipmapMain.SaveAsTgaAsync(Path.Combine(Path.GetDirectoryName(dest), file_name), tga);
@@ -255,8 +257,10 @@ namespace Resource_Manager.Classes.Ddt
 
         public async Task SaveAsPNG(string dest)
         {
-            PngEncoder png = new PngEncoder();
-            png.ColorType = PngColorType.RgbWithAlpha;
+            PngEncoder png = new()
+            {
+                ColorType = PngColorType.RgbWithAlpha
+            };
             var file_name = Path.GetFileNameWithoutExtension(dest);
             file_name = file_name + ".(" + ((byte)Usage).ToString() + "," + ((byte)Alpha).ToString() + "," + ((byte)Format).ToString() + "," + ((byte)MipmapLevels).ToString() + ").png";
             await mipmapMain.SaveAsPngAsync(Path.Combine(Path.GetDirectoryName(dest), file_name), png);
