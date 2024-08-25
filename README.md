@@ -21,7 +21,7 @@
 
 [Download Portable (.ZIP archive)](https://github.com/eBaeza/Resource-Manager/releases/download/0.6.0/ResourceManager.zip)<br />
 
-*__Note__: Portable version may require .NET6 desktop runtime: https://dotnet.microsoft.com/en-us/download/dotnet/6.0*
+*__Note__: Portable version may require .NET8 desktop runtime: https://dotnet.microsoft.com/en-us/download/dotnet/8.0*
 *__Another Note__: Versions below .NET 6.0.5 had a bug with displaying tooltips. Be sure that you are using an updated version of .NET if you find this bug.*
 You can also join my Discord server to stay up to date with the latest updates and news about my current developments and projects: [Commando Squad](https://discord.gg/egcZRKgj4q)
 
