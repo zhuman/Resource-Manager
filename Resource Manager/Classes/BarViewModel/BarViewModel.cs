@@ -419,10 +419,16 @@ namespace Archive_Unpacker.Classes.BarViewModel
                             data = await L33TZipUtils.ExtractL33TZippedBytesAsync(data);
                     }
 
-                    using MemoryStream stream = new MemoryStream(data);
+                    using MemoryStream stream = new (data);
                     XMBFile xmb = await XMBFile.LoadXMBFile(stream);
-                    string json = JsonConvert.SerializeXmlNode(xmb.file);
-                    await File.WriteAllTextAsync(Path.ChangeExtension(ExtractPath, "json"), json);
+                    string json = JsonConvert.SerializeXmlNode(xmb.file, Newtonsoft.Json.Formatting.None, true);
+                    await File.WriteAllTextAsync(
+                        Path.ChangeExtension(
+                            Path.ChangeExtension(ExtractPath, null),
+                            "json"
+                        ),
+                        json
+                    );
                 }
 
                 // Additionaly convert xml -> json
@@ -438,11 +444,17 @@ namespace Archive_Unpacker.Classes.BarViewModel
                             data = await L33TZipUtils.ExtractL33TZippedBytesAsync(data);
                     }
 
-                    using MemoryStream stream = new MemoryStream(data);
-                    XmlDocument xml = new XmlDocument();
+                    using MemoryStream stream = new (data);
+                    XmlDocument xml = new ();
                     xml.Load(stream);
-                    string json = JsonConvert.SerializeXmlNode(xml);
-                    await File.WriteAllTextAsync(Path.ChangeExtension(ExtractPath, "json"), json);
+                    string json = JsonConvert.SerializeXmlNode(xml, Newtonsoft.Json.Formatting.None, true);
+                    await File.WriteAllTextAsync(
+                        Path.ChangeExtension(
+                            Path.ChangeExtension(ExtractPath, null), 
+                            "json"
+                        ), 
+                        json
+                    );
                 }
 
 
