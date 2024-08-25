@@ -47,7 +47,7 @@
 </Hyperlink>
                 <LineBreak />
                 <Run FontSize="16"  Text="June 1, 2022"  />
-                <Run FontSize="14" Text="version: 0.5.0" TextDecorations="Underline"/>
+                <Run FontSize="14" Text="version: 0.6.0" TextDecorations="Underline"/>
             </TextBlock>
             <TextBlock
                 Grid.Row="1"
