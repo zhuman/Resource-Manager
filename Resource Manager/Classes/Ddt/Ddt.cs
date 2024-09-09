@@ -67,7 +67,11 @@ namespace Resource_Manager.Classes.Ddt
 
         public static CompressionFormat GetCompressionFormat(DdtFileTypeFormat format)
         {
-            return FormatMapping[format];
+            if (FormatMapping.ContainsKey(format))
+            {
+                return FormatMapping[format];
+            }
+            return CompressionFormat.Bgra;
         }
     }
 
@@ -215,11 +219,9 @@ namespace Resource_Manager.Classes.Ddt
             encoder.OutputOptions.Quality = CompressionQuality.Balanced;
             encoder.OutputOptions.Format = DDTFileHelper.GetCompressionFormat(Format);
             encoder.OutputOptions.FileFormat = OutputFileFormat.Dds;
-            //encoder.OutputOptions.DdsBc1WriteAlphaFlag = true;
             encoder.OutputOptions.MaxMipMapLevel = MipmapLevels;
 
             var mipmaps = await encoder.EncodeToRawBytesAsync(image);
-            //var mipmaps = await encoder.EncodeToRawBytesAsync(image);
 
             using (var ms = new MemoryStream())
             {
