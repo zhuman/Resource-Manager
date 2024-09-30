@@ -7,9 +7,9 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Title="Resource Manager Updater"
     Width="570"
-    SizeToContent="Height"
     Loaded="Window_Loaded"
     ResizeMode="NoResize"
+    SizeToContent="Height"
     WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
 
@@ -26,7 +26,7 @@
                 <ColumnDefinition Width="auto" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
-                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto" />
             </Grid.RowDefinitions>
             <Image
                 Grid.Row="0"
@@ -38,7 +38,6 @@
             <TextBlock
                 Grid.Row="0"
                 Grid.Column="1"
-             
                 VerticalAlignment="Center"
                 FontFamily="/Fonts/#Trajan Pro 3"
                 TextAlignment="Left">
@@ -50,7 +49,10 @@
 
                 <LineBreak />
                 <Run FontSize="14" Text="available version:" />
-                <Hyperlink NavigateUri="{Binding AvailableVersionUrl, Mode=OneWay}" RequestNavigate="Hyperlink_RequestNavigate" Cursor="Hand">
+                <Hyperlink
+                    Cursor="Hand"
+                    NavigateUri="{Binding AvailableVersionUrl, Mode=OneWay}"
+                    RequestNavigate="Hyperlink_RequestNavigate">
                     <Run FontSize="14" Text="{Binding AvailableVersion, TargetNullValue='unknown'}" />
                 </Hyperlink>
             </TextBlock>
@@ -73,11 +75,11 @@
             FontSize="14"
             Text="{Binding UpdateName}"
             TextDecorations="{x:Null}" />
-        <ProgressBar x:Name="pbProgress"
-                     Grid.Row="3"
+        <ProgressBar
+            x:Name="pbProgress"
+            Grid.Row="3"
             Width="520"
             Height="32"
-            
             Maximum="1"
             Value="{Binding Progress}" />
     </Grid>
