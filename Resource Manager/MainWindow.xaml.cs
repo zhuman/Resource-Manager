@@ -12,6 +12,7 @@ using Resource_Manager.Classes.Commands;
 using Resource_Manager.Classes.Ddt;
 using Resource_Manager.Classes.L33TZip;
 using Resource_Manager.Classes.Sort;
+using Resource_Manager.Classes.sound;
 using Resource_Manager.Classes.Xmb;
 using System;
 using System.Collections.Generic;
@@ -145,12 +146,7 @@ namespace Resource_Manager
 
 
         FoldingManager foldingManager;
-        private WaveOutEvent outputDevice;
-        private Mp3FileReader mp3File;
-        private WaveFileReader waveFile;
-
-
-
+        public PlaybackManager playbackManager { get; } = new PlaybackManager();
 
         private async void files_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -169,28 +165,13 @@ namespace Resource_Manager
                 var entries = files.SelectedItems.Cast<BarEntry>().ToList();
                 SelectedSize = entries.Sum(x => (long)x.FileSize2);
                 await file.readFile(entry);
-                if (outputDevice != null)
-                {
-                    outputDevice.Dispose();
-                    outputDevice = null;
-                }
-                if (mp3File != null)
-                {
-                    mp3File.Dispose();
-                    mp3File = null;
-                }
-                if (waveFile != null)
-                {
-                    waveFile.Dispose();
-                    waveFile = null;
-                }
                 point = new Point();
                 validPoint = false;
                 ImagePreview.RenderTransform = new TranslateTransform();
 
-                if (file.Preview != null)
+                if (file.PreviewText != null)
                 {
-                    XMLViewer.Text = file.Preview.Text;
+                    XMLViewer.Text = file.PreviewText.Text;
                     if (foldingManager != null)
                     {
                         FoldingManager.Uninstall(foldingManager);
@@ -210,36 +191,11 @@ namespace Resource_Manager
                     }
                 }
 
-                if (entry.Extension == ".WAV")
+                if (entry.Extension == ".WAV" || entry.Extension == ".MP3")
                 {
+                    playbackManager.CurrentSource = file.PreviewAudio;
 
-                    using (outputDevice = new WaveOutEvent())
-                    using (waveFile = new WaveFileReader(file.audio))
-                    {
-                        outputDevice.Init(waveFile);
-                        outputDevice.Play();
-                        while (outputDevice.PlaybackState == PlaybackState.Playing)
-                        {
-                            await Task.Delay(500);
-                        }
-                    }
-                    ImageViewer.Visibility = Visibility.Collapsed;
-                    XMLViewer.Visibility = Visibility.Collapsed;
-                }
-                if (entry.Extension == ".MP3")
-                {
-                    //var w = new WaveFormat(new BinaryReader(file.audio));
-                    //MessageBox.Show(w.Encoding.ToString());
-                    using (outputDevice = new WaveOutEvent())
-                    using (mp3File = new Mp3FileReader(file.audio))
-                    {
-                        outputDevice.Init(mp3File);
-                        outputDevice.Play();
-                        while (outputDevice.PlaybackState == PlaybackState.Playing)
-                        {
-                            await Task.Delay(500);
-                        }
-                    }
+                    AudioViewer.Visibility = Visibility.Visible;
                     ImageViewer.Visibility = Visibility.Collapsed;
                     XMLViewer.Visibility = Visibility.Collapsed;
                 }
@@ -249,6 +205,7 @@ namespace Resource_Manager
                     ImagePreview.Source = file.PreviewDdt.Bitmap;
                     XMLViewer.Visibility = Visibility.Collapsed;
                     ImageViewer.Visibility = Visibility.Visible;
+                    AudioViewer.Visibility = Visibility.Collapsed;
                 }
                 else
                 if (entry.Extension == ".TGA" || entry.Extension == ".BMP" || entry.Extension == ".PNG" || entry.Extension == ".CUR" || entry.Extension == ".JPG")
@@ -256,18 +213,20 @@ namespace Resource_Manager
                     ImagePreview.Source = file.PreviewImage;
                     XMLViewer.Visibility = Visibility.Collapsed;
                     ImageViewer.Visibility = Visibility.Visible;
+                    AudioViewer.Visibility = Visibility.Collapsed;
                 }
                 else
                 if (entry.Extension == ".XMB" || entry.Extension == ".XML" || entry.Extension == ".SHP" || entry.Extension == ".LGT" || entry.Extension == ".XS" || entry.Extension == ".TXT" || entry.Extension == ".CFG" || entry.Extension == ".XAML" || entry.Extension == ".PY")
                 {
                     ImageViewer.Visibility = Visibility.Collapsed;
                     XMLViewer.Visibility = Visibility.Visible;
+                    AudioViewer.Visibility = Visibility.Collapsed;
                 }
                 else
                 {
                     ImageViewer.Visibility = Visibility.Collapsed;
                     XMLViewer.Visibility = Visibility.Collapsed;
-
+                    AudioViewer.Visibility = Visibility.Collapsed;
                 }
 
             }

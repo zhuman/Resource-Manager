@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using NAudio.Wave;
+using Newtonsoft.Json;
 using Resource_Manager.Classes.Alz4;
 using Resource_Manager.Classes.Bar;
 using Resource_Manager.Classes.Ddt;
@@ -106,7 +107,19 @@ namespace Archive_Unpacker.Classes.BarViewModel
             CurrentProgress = 0;
         }
 
-        public MemoryStream audio { get; set; }
+        public class AudioSource
+        {
+            public WaveStream Audio { get; init; }
+            public MemoryStream RawAudioStream { get; init; }
+
+            public string FormatText => Audio?.WaveFormat.ToString() ?? "Unknown";
+        }
+
+        private MemoryStream rawAudioStream;
+        private Func<Stream, WaveStream> rawAudioToWaveStream;
+        private AudioSource previewAudio;
+
+        public AudioSource PreviewAudio => previewAudio ?? (rawAudioStream == null ? null : (previewAudio = new AudioSource { RawAudioStream = rawAudioStream, Audio = rawAudioToWaveStream(rawAudioStream) }));
 
         public string barFilePath { get; set; }
         public BarFile barFile { get; set; }
@@ -139,13 +152,13 @@ namespace Archive_Unpacker.Classes.BarViewModel
             public string SyntaxHighlighting { get; set; }
         }
 
-        private Document preview;
-        public Document Preview
+        private Document previewText;
+        public Document PreviewText
         {
-            get { return preview; }
+            get { return previewText; }
             set
             {
-                preview = value;
+                previewText = value;
                 NotifyPropertyChanged();
             }
         }
@@ -491,7 +504,7 @@ namespace Archive_Unpacker.Classes.BarViewModel
             // Firstly, is the file parameter null?
 
             PreviewDdt = null;
-            Preview = null;
+            PreviewText = null;
             PreviewImage = null;
             if (file == null)
                 return;
@@ -504,15 +517,23 @@ namespace Archive_Unpacker.Classes.BarViewModel
                 var data = new byte[file.FileSize2];
                 await input.ReadAsync(data, 0, data.Length);
 
+                previewAudio = null;
+
                 if (file.isCompressed == 2)
                 {
-                    audio = new MemoryStream(await soundUtils.DecryptSound(data));
+                    rawAudioStream = new MemoryStream(await soundUtils.DecryptSound(data));
                 }
                 else
-                    audio = new MemoryStream(data);
+                    rawAudioStream = new MemoryStream(data);
+
+                if (file.Extension == ".WAV")
+                    rawAudioToWaveStream = (stream) => new WaveFileReader(stream);
+                else if (file.Extension == ".MP3")
+                    rawAudioToWaveStream = (stream) => new Mp3FileReader(stream);
+
                 return;
             }
-            if (file.Extension == ".DDT")
+            else if (file.Extension == ".DDT")
             {
                 using FileStream input = File.OpenRead(barFilePath);
                 // Locate the file within the BAR file.
@@ -538,7 +559,7 @@ namespace Archive_Unpacker.Classes.BarViewModel
                 PreviewDdt = ddt;
                 return;
             }
-            if (file.Extension == ".BMP" || file.Extension == ".TGA" || file.Extension == ".PNG" || file.Extension == ".CUR" || file.Extension == ".JPG")
+            else if (file.Extension == ".BMP" || file.Extension == ".TGA" || file.Extension == ".PNG" || file.Extension == ".CUR" || file.Extension == ".JPG")
             {
                 using FileStream input = File.OpenRead(barFilePath);
                 // Locate the file within the BAR file.
@@ -621,14 +642,16 @@ namespace Archive_Unpacker.Classes.BarViewModel
 
                 //File.WriteAllBytes(file.fileNameWithoutPath, data);
 
-                Preview = new Document();
-                Preview.SyntaxHighlighting = "XML";
-                Preview.Text = await XMBFile.XmbToXmlAsync(data);
+                PreviewText = new Document()
+                {
+                    SyntaxHighlighting = "XML",
+                    Text = await XMBFile.XmbToXmlAsync(data)
+                };
 
                 NotifyPropertyChanged("Preview");
                 return;
             }
-            if (file.Extension == ".XAML" || file.Extension == ".XML" || file.Extension == ".SHP" || file.Extension == ".LGT" || file.Extension == ".XS" || file.Extension == ".TXT" || file.Extension == ".CFG" || file.Extension == ".PY" || file.Extension == ".TACTICS")
+            else if (file.Extension == ".XAML" || file.Extension == ".XML" || file.Extension == ".SHP" || file.Extension == ".LGT" || file.Extension == ".XS" || file.Extension == ".TXT" || file.Extension == ".CFG" || file.Extension == ".PY" || file.Extension == ".TACTICS")
             {
                 using FileStream input = File.OpenRead(barFilePath);
                 // Locate the file within the BAR file.
@@ -644,12 +667,15 @@ namespace Archive_Unpacker.Classes.BarViewModel
                     if (L33TZipUtils.IsL33TZipFile(data))
                         data = await L33TZipUtils.ExtractL33TZippedBytesAsync(data);
                 }
-                Preview = new Document();
-                Preview.Text = System.Text.Encoding.UTF8.GetString(data);
-                if (file.Extension == ".XS")
-                    Preview.SyntaxHighlighting = "C++";
-                else
-                    Preview.SyntaxHighlighting = "XML";
+                PreviewText = new Document()
+                {
+                    Text = System.Text.Encoding.UTF8.GetString(data),
+                    SyntaxHighlighting = file.Extension switch
+                    {
+                        ".XS" => "C++",
+                        _ => "XML"
+                    }
+                };
                 NotifyPropertyChanged("Preview");
                 return;
             }

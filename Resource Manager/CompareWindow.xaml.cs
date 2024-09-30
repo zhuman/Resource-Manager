@@ -287,7 +287,7 @@ namespace Resource_Manager
 
 
 
-                if (Bar1.Preview != null && Bar2.Preview != null)
+                if (Bar1.PreviewText != null && Bar2.PreviewText != null)
                 {
                     try
                     {
@@ -295,7 +295,7 @@ namespace Resource_Manager
                         IEnumerable<string> New = new List<string>();
                         await Task.Run(() =>
                         {
-                            var diff = SideBySideDiffBuilder.Diff(Bar1.Preview.Text, Bar2.Preview.Text);
+                            var diff = SideBySideDiffBuilder.Diff(Bar1.PreviewText.Text, Bar2.PreviewText.Text);
 
 
                             Old = diff.OldText.Lines.Select(x =>
@@ -326,9 +326,9 @@ namespace Resource_Manager
 
                 if (entryNew == null)
                 {
-                    if (Bar1.Preview != null)
+                    if (Bar1.PreviewText != null)
                     {
-                        XMLViewer1.Text = Bar1.Preview.Text;
+                        XMLViewer1.Text = Bar1.PreviewText.Text;
                     }
                 }
 
@@ -336,9 +336,9 @@ namespace Resource_Manager
                 if (entryOld == null)
                 {
 
-                    if (Bar2.Preview != null)
+                    if (Bar2.PreviewText != null)
                     {
-                        XMLViewer2.Text = Bar2.Preview.Text;
+                        XMLViewer2.Text = Bar2.PreviewText.Text;
                     }
                 }
                 if (entryOld != null)
